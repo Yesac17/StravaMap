@@ -8,8 +8,23 @@
     </head>
     <body>
         <h1>Running Routes Maps</h1>
+        <div id="stats">
+            <h2>Run Stats</h2>
+            <ul>
+                <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
+                <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
+                <li><b>Pace:</b> <span id = "pace">-</span> min/mi</li>
+            </ul>
+        </div>
+
+        <div id="elevation-container">
+            <h2>Elevation Profile</h2>
+            <canvas id="elevationChart" height="200"></canvas>
+        </div>
+
         <div id="map"></div>
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="script.js"></script>
     </body>
 </html>

@@ -26,6 +26,15 @@ fetch('routes/tracks.geojson')
         }).addTo(map);
     });
 
+function haversine(p1, p2) {
+    const R = 6371; //Earth radius in km
+    const toRad = deg => deg * Math.PI / 180;
+    const dLat = toRad(p2.lat - p1.lat);
+    const dLon = toRad(p2.lon - p1.lon);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(p1.lat)) * Math.cos(toRad(p2.lat)) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); // in km
+}
+
 fetch('routes/track_points.geojson')
     .then(res => res.json())
     .then(pointsData => {
@@ -41,12 +50,63 @@ fetch('routes/track_points.geojson')
                     color: 'red',
                     fillOpacity: 0.7
                 }).addTo(map).bindPopup(`
-                    <b>Elevation:</b> ${elevation * 3.28} ft<br>
+                    <b>Elevation:</b> ${(elevation * 3.28).toFixed(0)} ft<br>
                     <b>Time:</b> ${new Date(time).toLocaleTimeString()}<br>
                     <b>Heart Rate:</b> ${hr || 'n/a'} bpm
                     `);
             }
         });
+
+        
+        const coords = pointsData.features.map(f => {
+            const [lon, lat] = f.geometry.coordinates;
+            const ele = f.properties.ele; //* 3.28
+            const time = new Date(f.properties.time);
+            return { lat, lon, ele, time};
+        });
+
+        // Building elevation chart
+        let distance = 0;
+        const elevationData = [];
+        const labels = [];
+
+        for (let i = 1; i < coords.length; i++) {
+            const prev = coords[i - 1];
+            const curr = coords[i];
+
+            // add distance between points
+            distance += haversine(prev, curr);
+
+            // Add elevation point
+            elevationData.push(curr.ele * 3.28084); // convert m to ft
+            labels.push((distance / 1.609).toFixed(2)); // distance in mi
+        }
+
+        let totalDist = 0;
+        let totalElevGain = 0;
+        for (let i = 1; i < coords.length; i++) {
+            const prev = coords[i-1];
+            const curr = coords[i];
+
+            totalDist += haversine(coords[i-1],coords[i]);
+
+            const gain = coords[i].ele - coords[i - 1].ele;
+
+            if (!isNaN(gain) && gain > 0.05) { // ~2 inches
+                totalElevGain += gain;
+            }
+        }
+
+        const totalTimeSec = (coords.at(-1).time - coords[0].time) / 1000;
+        const avgPace = totalTimeSec / 60 / (totalDist / 1.609);
+        const paceMin = Math.floor(avgPace);
+        const paceDec = avgPace - paceMin;
+        const paceSec = paceDec * 60;
+
+
+        document.getElementById("distance").textContent = (totalDist / 1.609).toFixed(2);
+        document.getElementById("elevation").textContent = Math.round(totalElevGain);
+        document.getElementById("pace").textContent = paceMin + ":" + paceSec.toFixed(0);
     });
 
     function extractFromExtension(xmlStr, tag) {

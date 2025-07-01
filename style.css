@@ -7,3 +7,16 @@ body {
     height: 90vh;
     width: 100%;
 }
+
+#stats {
+    background: #f8f8f8;
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+}
+
+#elevation-container {
+  background: #f9f9f9;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #ddd;
+}
