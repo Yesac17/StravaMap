@@ -4,19 +4,25 @@ body {
 }
 
 #map {
-    height: 90vh;
+    height: 60vh;
     width: 100%;
 }
 
-#stats {
-    background: #f8f8f8;
-    padding: 1rem;
-    border-bottom: 1px solid #ccc;
+#info-panel {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  /*flex-wrap: wrap;  mobile responsive */
+  align-items: flex-start;
+}
+
+#stats, #elevation_container {
+    flex: 1;
 }
 
 #elevation-container {
   background: #f9f9f9;
   padding: 1rem;
-  margin: 1rem 0;
   border: 1px solid #ddd;
+  min-width: 250px;
 }

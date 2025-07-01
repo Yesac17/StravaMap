@@ -65,6 +65,10 @@ fetch('routes/track_points.geojson')
             return { lat, lon, ele, time};
         });
 
+        // Center map on route
+        const latlngs = coords.map(c => [c.lat, c.lon]);
+        map.fitBounds(latlngs);
+
         // Building elevation chart
         let distance = 0;
         const elevationData = [];
@@ -82,6 +86,47 @@ fetch('routes/track_points.geojson')
             labels.push((distance / 1.609).toFixed(2)); // distance in mi
         }
 
+        const ctx = document.getElementById('elevationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Elevation (ft)',
+                    data: elevationData,
+                    fill: true,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3,
+                    pointRadius: 0,
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Distance (mi)'
+                        },
+                        ticks: {
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Elevation (ft)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
         let totalDist = 0;
         let totalElevGain = 0;
         for (let i = 1; i < coords.length; i++) {
@@ -92,7 +137,7 @@ fetch('routes/track_points.geojson')
 
             const gain = coords[i].ele - coords[i - 1].ele;
 
-            if (!isNaN(gain) && gain > 0.05) { // ~2 inches
+            if (!isNaN(gain) && gain > 0) { // ~2 inches
                 totalElevGain += gain;
             }
         }
@@ -105,7 +150,7 @@ fetch('routes/track_points.geojson')
 
 
         document.getElementById("distance").textContent = (totalDist / 1.609).toFixed(2);
-        document.getElementById("elevation").textContent = Math.round(totalElevGain);
+        document.getElementById("elevation").textContent = Math.round(totalElevGain *  3.28);
         document.getElementById("pace").textContent = paceMin + ":" + paceSec.toFixed(0);
     });
 
