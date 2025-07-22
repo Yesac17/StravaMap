@@ -14,22 +14,27 @@
         <div id="info-panel">
             <div id="stats">
                 <h2>Run Stats</h2>
-                <ul>
+                <ul id="statBox" height="150", width="100">
                     <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
                     <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
                     <li><b>Pace:</b> <span id = "pace">-</span> min/mi</li>
                 </ul>
             </div>
 
+            <div id="pace-container">
+                <h2>Pace Chart</h2>
+                <canvas id="paceChart" height="150", width="300"></canvas>
+            </div>
+
             <div id="elevation-container">
                 <h2>Elevation Profile</h2>
-                <canvas id="elevationChart" height="150", width="500"></canvas>
+                <canvas id="elevationChart" height="150", width="300"></canvas>
             </div>
         </div>
 
         
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <script src="script.js"></script>
     </body>
 </html>
