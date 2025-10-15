@@ -93,7 +93,7 @@ Promise.all([
             `).openPopup();
 
             const matchIndex = targetChart.data.labels.findIndex(l => 
-                Math.abs(parseFloat(1) - hoveredDist) < 0.01
+                Math.abs(parseFloat(l) - hoveredDist) < 0.01
             );
 
             if (matchIndex === -1) return;
