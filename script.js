@@ -12,8 +12,7 @@
 
 
 // ==================== 1. MAP INITIALIZATION ====================
-
-const map = L.map('map').setView([44.8765, -91.9207], 13);
+const map = L.map('map').setView([44.8765, -91.9207], 7);
 
 // Add OpenStreetMap tiles Layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -24,7 +23,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Compute squared distance between two points (used for nearest-point lookup)
 function distanceSq(a,b) {
-            return (a.lat - b.lat) ** 2 + (a.lon - b.lng) ** 2;
+            return (a.lat - b.lat) ** 2 + (a.lon - b.lon) ** 2;
         }
 
  // Great-circle distance using the Haversine formula (returns km)
@@ -43,18 +42,64 @@ function extractFromExtension(xmlStr, tag) {
         return match ? match[1]: null;
 }
 
+const routeGroup = L.layerGroup().addTo(map);
+const markerGroup = L.layerGroup().addTo(map);
 
-// ==================== 3. LOAD and Process GeoJSON Data ====================
-const dropdown = document.getElementById('colorSelect');
-Promise.all([
-    fetch('routes/tracks.geojson').then(res => res.json()),
-    fetch('routes/track_points.geojson').then(res => res.json())
-]).then(([trackData, pointData]) => {
+ // --- Hover Marker for synced charts ---
+    const hoverMarker = L.circleMarker([0,0], {
+        radius: 7,
+        color: 'orange',
+        fillColor: 'yellow',
+        fillOpacity: 0.8,
+    })
+    .addTo(map)
+    .setStyle({ opacity: 0, fillOpacity: 0 });
 
+    let currentCharts = {elevation: null, pace: null};
+    let currentHandlers = {elevation: null, pace: null};
+
+// ==================== 3. ROUTE LOADING & PROCESSING ====================
+
+
+const dropdown = document.getElementById('route');
+dropdown.addEventListener('change', function () {
+    routeGroup.clearLayers();
+    markerGroup.clearLayers();
+
+    hoverMarker.setStyle({ opacity: 0, fillOpacity: 0 });
+    if (hoverMarker.isPopupOpen && hoverMarker.isPopupOpen()) hoverMarker.closePopup();
+
+    // Destroy existing charts if any
+    if (currentCharts.elevation) {
+        if (currentCharts.elevation.canvas && currentHandlers.elevation?.hide) {
+            currentCharts.elevation.canvas.addEventListener('mouseleave', currentHandlers.elevation.hide);
+        }
+        currentCharts.elevation.destroy();
+        currentCharts.elevation = null;
+    }
+    if (currentCharts.pace) {
+        if (currentCharts.pace.canvas && currentHandlers.pace?.hide) {
+            currentCharts.pace.canvas.addEventListener('mouseleave', currentHandlers.pace.hide);
+        }
+        currentCharts.pace.destroy();
+        currentCharts.pace = null;
+    }
+
+    // clear stored handlers
+    currentHandlers = {elevation: null, pace: null};
+
+    const selectedValue = dropdown.value;
+    if (!selectedValue) return;
+
+    Promise.all([
+        fetch(`routes/${selectedValue}/tracks.geojson`).then(res => res.json()),
+        fetch(`routes/${selectedValue}/track_points.geojson`).then(res => res.json())
+    ]).then(([trackData, pointData]) => {
+        
     // ------ Draw Route Polyline on Map ------
     const polyline = L.geoJSON(trackData, {
             style: { color: 'blue', weight: 4 }            
-        }).addTo(map);
+        }).addTo(routeGroup);
 
 
     // ------ Extract Coordinate Data ------
@@ -77,76 +122,111 @@ Promise.all([
 
 // ==================== 4. Map Interactions ====================
 
-    // --- Hover Marker for synced charts ---
-    const hoverMarker = L.circleMarker([0,0], {
-        radius: 7,
-        color: 'orange',
-        fillColor: 'yellow',
-        fillOpacity: 0.8,
-    })
-    .addTo(map)
-    .setStyle({ opacity: 0, fillOpacity: 0 });
 
+    let isSyncing = false;
 
-    // --- Sync Tooltip Handler for Charts ---
-    function handleTooltipSync(sourceChart, targetChart, coords) {
-        return function(context) {
-            const tooltip = context.tooltip;
+    function makeSyncHandlers(sourceChart, targetChart, coords) {
+  // clear/hide everything (used by external/onHover and by mouseleave)
+  function hideAll() {
+    // hide hover marker & popup
+    hoverMarker.setStyle({ opacity: 0, fillOpacity: 0 });
+    if (hoverMarker.isPopupOpen && hoverMarker.isPopupOpen()) hoverMarker.closePopup();
 
-            // When mouse leaves chart, hide everything
-            if (tooltip.opacity === 0) {
-                hoverMarker.setStyle({ opacity: 0, fillOpacity: 0 });
-                hoverMarker.closePopup();
-                targetChart.setActiveElements([]);
-                targetChart.tooltip.setActiveElements([], {x: 0, y: 0});
-                targetChart.update();
-                return;
-            }
+    // clear tooltips/active elements on both charts and redraw
+    try {
+      sourceChart.tooltip.setActiveElements([], { x: 0, y: 0 });
+    } catch (e) {}
+    try {
+      targetChart.tooltip.setActiveElements([], { x: 0, y: 0 });
+    } catch (e) {}
 
-            // Match hovered distance to map coordinate
-            const hoveredDist = parseFloat(tooltip.dataPoints[0].label);
-            let nearest = coords.reduce((a,b) =>
-                Math.abs((a.distanceMi || 0) - hoveredDist) < 
-                Math.abs((b.distanceMi || 0) - hoveredDist) ? a : b
-            );
+    try { sourceChart.update(); } catch (e) {}
+    try { targetChart.update(); } catch (e) {}
+  }
 
-            // Update hover marker position and popup
-            hoverMarker.setLatLng([nearest.lat, nearest.lon]);
-            hoverMarker.setStyle({ opacity: 1, fillOpacity: 0.8});
+  function syncByDistance(hoveredDist) {
+    // find nearest coordinate by distanceMi
+    const nearest = coords.reduce((a, b) =>
+      Math.abs((a.distanceMi || 0) - hoveredDist) < Math.abs((b.distanceMi || 0) - hoveredDist)
+        ? a
+        : b
+    );
 
-            const elevationFt = (nearest.ele * 3.28084).toFixed(0);
-            const timeStr = nearest.time.toLocaleTimeString();
-            const hr = nearest.hr;
+    // update hover marker and popup (bind once)
+    hoverMarker.setLatLng([nearest.lat, nearest.lon]);
+    hoverMarker.setStyle({ opacity: 1, fillOpacity: 0.8 });
+    if (!hoverMarker.getPopup()) hoverMarker.bindPopup('');
+    hoverMarker.setPopupContent(`
+      <b>Distance:</b> ${nearest.distanceMi.toFixed(2)} mi<br>
+      <b>Elevation:</b> ${(nearest.ele * 3.28084).toFixed(0)} ft<br>
+      <b>Time:</b> ${nearest.time.toLocaleTimeString()}<br>
+      <b>Heart Rate:</b> ${nearest.hr || 'n/a'} bpm
+    `).openPopup();
 
-            if (!hoverMarker.getPopup()) {
-                hoverMarker.bindPopup('');
-            }
-            hoverMarker
-                .setPopupContent(`
-                    <b>Elevation:</b> ${elevationFt} ft<br>
-                    <b>Time:</b> ${timeStr} <br>
-                    <b>Heart Rate:</b> ${hr || 'n/a'} bpm`
-                ).openPopup();
-            
-            // Highlight corresponding point on target chart
-            const matchIndex = targetChart.data.labels.findIndex(
-                l => Math.abs(parseFloat(l) - hoveredDist) < 0.01
-            );
-
-            if (matchIndex !== -1) {
-                targetChart.setActiveElements([{ datasetIndex: 0, index: matchIndex }]);
-                targetChart.tooltip.setActiveElements([{ datasetIndex: 0, index: matchIndex }]);
-                if (targetChart.options.plugins.tooltip.external) {
-                    targetChart.options.plugins.tooltip.external({
-                        tooltip: targetChart.tooltip,
-                        chart: targetChart
-                    });
-                }
-                targetChart.update();
-            }
-
-        }
+    // highlight matching index on target chart and show tooltip there
+    const matchIndex = targetChart.data.labels.findIndex(l => Math.abs(parseFloat(l) - hoveredDist) < 0.01);
+    if (matchIndex === -1) {
+      targetChart.tooltip.setActiveElements([], { x: 0, y: 0 });
+      targetChart.update();
+      return;
     }
+
+    const meta = targetChart.getDatasetMeta(0);
+    const element = meta.data[matchIndex];
+    if (!element) return;
+
+    const { x, y } = element.getProps(['x', 'y'], true);
+    targetChart.tooltip.setActiveElements([{ datasetIndex: 0, index: matchIndex }], { x, y });
+    targetChart.update();
+  }
+
+  // Chart.js external tooltip handler
+  function externalHandler(context) {
+    if (isSyncing) return;
+    isSyncing = true;
+    try {
+      const tooltip = context.tooltip;
+      if (!tooltip || tooltip.opacity === 0) {
+        hideAll();
+        return;
+      }
+      const hoveredDist = parseFloat(tooltip.dataPoints[0].label);
+      if (Number.isFinite(hoveredDist)) syncByDistance(hoveredDist);
+    } finally {
+      isSyncing = false;
+    }
+  }
+
+  // Chart.js onHover handler (event, activeElements, chart)
+  function onHoverHandler(event, activeElements, chart) {
+    if (isSyncing) return;
+    isSyncing = true;
+    try {
+      if (!activeElements || activeElements.length === 0) {
+        hideAll();
+        return;
+      }
+      const idx = activeElements[0].index;
+      const hoveredDist = parseFloat(sourceChart.data.labels[idx]);
+      if (Number.isFinite(hoveredDist)) syncByDistance(hoveredDist);
+    } finally {
+      isSyncing = false;
+    }
+  }
+
+  // expose a hide function for mouseleave
+  function hide() {
+    if (isSyncing) return;
+    isSyncing = true;
+    try {
+      hideAll();
+    } finally {
+      isSyncing = false;
+    }
+  }
+
+  return { external: externalHandler, onHover: onHoverHandler, hide };
+}
 
     // --- Compute total stats (distance, elevation, pace) ---
     let totalDist = 0;
@@ -227,7 +307,7 @@ Promise.all([
                     iconAnchor: [12, 12]
                 })
             })
-            .addTo(map)
+            .addTo(markerGroup)
             .bindPopup(`<b>Mile ${mileCount}: ${paceStr}</b>`);
 
             mileCount++;
@@ -430,9 +510,28 @@ Promise.all([
         },
         plugins: [crosshairPlugin]
     });
-    // --- Link both charts via hover sync ---
-    elevationChart.options.plugins.tooltip.external = 
-        handleTooltipSync(elevationChart, paceChart, coords);
-    paceChart.options.plugins.tooltip.external = 
-        handleTooltipSync(paceChart, elevationChart, coords);
-})
+    // // --- Link both charts via hover sync ---
+    // elevationChart.options.plugins.tooltip.external = 
+    //     handleTooltipSync(elevationChart, paceChart, coords);
+    // paceChart.options.onHover = 
+    //     handleTooltipSync(paceChart, elevationChart, coords);
+    // });
+
+        // create handlers after you construct both charts
+    const handlers1 = makeSyncHandlers(elevationChart, paceChart, coords);
+    const handlers2 = makeSyncHandlers(paceChart, elevationChart, coords);
+
+    // Hybrid setup (reliable): one chart uses external, the other uses onHover
+    elevationChart.options.plugins.tooltip.external = handlers1.external;
+    paceChart.options.onHover = handlers2.onHover;
+
+    if (elevationChart.canvas) { elevationChart.canvas.addEventListener('mouseleave', handlers1.hide); }
+    if (paceChart.canvas) { paceChart.canvas.addEventListener('mouseleave', handlers2.hide); }
+
+    // store current charts and handlers for later cleanup
+    currentCharts.elevation =elevationChart;
+    currentCharts.pace = paceChart;
+    currentHandlers.elevation = handlers1;
+    currentHandlers.pace = handlers2;
+});
+});
