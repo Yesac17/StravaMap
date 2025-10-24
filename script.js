@@ -12,7 +12,11 @@
 
 
 // ==================== 1. MAP INITIALIZATION ====================
-const map = L.map('map').setView([44.8765, -91.9207], 7);
+const map = L.map('map', {
+    center: [44.8765, -91.9207],
+    WorldCopyJump: true,
+    zoom: 7
+});
 
 // Add OpenStreetMap tiles Layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

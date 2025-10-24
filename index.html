@@ -6,21 +6,34 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
         <link rel="stylesheet" href="style.css">
     </head>
-    <body>
-        <h1>Running Routes Maps</h1>
+    <header>
+            <h1>Running Routes Maps</h1>
 
-        <label for="Route">Choose a Route:</label>
-    <select id="route" name="Route">
-        <option value="">-- Select a Route --</option>
-        <option value="Turkey">Turkey</option>
-        <option value="Marathon">Marathon</option>
-    </select>
+            <div id="route-selection">
+                <label for="Route">Choose a Route:</label>
+                    <select id="route" name="Route">
+                        <option value="">-- Select a Route --</option>
+                        <option value="Turkey">Turkey</option>
+                        <option value="Marathon">Marathon</option>
+                        <option value="puddle_jumping">Puddle Jumping</option>
+                    </select>
+            </div>
+        </header>
+    <body>
+        <div class="upload-container">
+            <!-- enctype is required for file uploads -->
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <label for="fileInput">Choose file(s):</label><br>
+                <input type="file" id="fileInput" name="files" multiple required><br>
+                <button type="submit">Upload</button>
+            </form>
+        </div>
 
         <div id="map"></div>
 
         <div id="info-panel">
             <div id="stats">
-                <h2>Run Stats</h2>
+                <h2>Run Statistics</h2>
                 <ul id="statBox" height="150", width="100">
                     <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
                     <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
