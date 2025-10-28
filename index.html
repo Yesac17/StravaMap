@@ -16,6 +16,7 @@
                         <option value="Turkey">Turkey</option>
                         <option value="Marathon">Marathon</option>
                         <option value="puddle_jumping">Puddle Jumping</option>
+                        <option value="file_upload">File Upload</option>
                     </select>
             </div>
         </header>
@@ -24,8 +25,7 @@
             <!-- enctype is required for file uploads -->
             <form action="/upload" method="POST" enctype="multipart/form-data">
                 <label for="fileInput">Choose file(s):</label><br>
-                <input type="file" id="fileInput" name="files" multiple required><br>
-                <button type="submit">Upload</button>
+                <input type="file" id="folderInput" name="files[]" webkitdirectory directory multiple accept=".geojson,.gpx"><br> <!-- Allows file upload -->
             </form>
         </div>
 

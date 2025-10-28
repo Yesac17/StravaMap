@@ -19,10 +19,34 @@ const map = L.map('map', {
 });
 
 // Add OpenStreetMap tiles Layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var openStreetMaps = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'Map data © OpenStreetMap contributors'
-}).addTo(map);
+});
 
+var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+maxZoom: 20,
+subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+});
+
+var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+});
+
+var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+});
+
+var baseMaps = {
+    "OpenStreetMap": openStreetMaps,
+    "Google Satellite": googleSat,
+    "Google Hybrid": googleHybrid,
+    "Google Terrain": googleTerrain
+};
+
+L.control.layers(baseMaps).addTo(map);
+openStreetMaps.addTo(map);
 // ==================== 2. HELPER FUNCTIONS ======================
 
 // Compute squared distance between two points (used for nearest-point lookup)
@@ -63,10 +87,17 @@ const markerGroup = L.layerGroup().addTo(map);
     let currentHandlers = {elevation: null, pace: null};
 
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
-
+const fileInp = document.getElementById('folderInput');
+let fileList = [];
+fileInp.addEventListener('change', async function(event) {
+    fileList = event.target.files; // FileList object
+    for (let i = 0; i < fileList.length; i++) {
+        console.log(`File Name: ${fileList[i].name}, Size: ${fileList[i].size} bytes`);
+    }
+});
 
 const dropdown = document.getElementById('route');
-dropdown.addEventListener('change', function () {
+dropdown.addEventListener('change', async function () {
     routeGroup.clearLayers();
     markerGroup.clearLayers();
 
@@ -95,11 +126,67 @@ dropdown.addEventListener('change', function () {
     const selectedValue = dropdown.value;
     if (!selectedValue) return;
 
-    Promise.all([
-        fetch(`routes/${selectedValue}/tracks.geojson`).then(res => res.json()),
-        fetch(`routes/${selectedValue}/track_points.geojson`).then(res => res.json())
-    ]).then(([trackData, pointData]) => {
+    let  tracks, trackPoints; 
+    if(selectedValue !== 'file_upload'){
+            tracks = `routes/${selectedValue}/tracks.geojson`;
+            trackPoints = `routes/${selectedValue}/track_points.geojson`;
+
+            const [trackData, pointData] = await Promise.all([
+                fetch(tracks).then(res => res.json()),
+                fetch(trackPoints).then(res => res.json())
+            ]);
+            loadRoute(trackData, pointData);
+    }
+    else if(selectedValue === 'file_upload'){
+        // Handle file upload case here
+        // For example, read files from the input element and parse them
+        // Return appropriate GeoJSON data
+        // Alright so actually this doesn't work because you can't use fetch on local files, instead we must read the files directly with FileReader.
+        // tracks = fileList[0].name; 
+        // console.log(tracks);// Example: first file as tracks
+        // trackPoints = fileList[1].name;
+        // console.log(trackPoints); // Example: second file as track points
+
+        // First I will make sure the user uploaded exactly two files
+        if(fileList.length < 2){
+            alert("Please upload two files: tracks.geojson and track_points.geojson");
+            return;
+        }
+
+        // Now I will use FileReader to read the contents of these files and use a Try Catch block to parse them as JSON
+
+        const readFile = file =>
+            new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(JSON.parse(reader.result));
+                reader.onerror = () => reject(reader.error);
+                reader.readAsText(file);
+            });
         
+        try {
+            const [trackData, pointData] = await Promise.all([
+                readFile(fileList[0]),
+                readFile(fileList[1])
+            ]);
+
+            console.log('Loaded uploaded files:', fileList[0].name, fileList[1].name);
+            loadRoute(trackData, pointData);
+        } catch (error) {
+            console.error('Error reading uploaded files:', error);
+            alert('Error reading uploaded files.');
+        }
+        
+    }
+});
+// Ok now I have adjusted the code to read the uploaded files directly using FileReader and parse them as JSON. Now I will move the route loading logic into a separate function called loadRoute to avoid code duplication.
+// Wondering if I need to keep this promise.all here. The answer is no, I can move it into the loadRoute function. I will do that now.
+
+async function loadRoute(trackData, pointData) {
+// Did I do this right? I'm pretty sure i dont need this promise.all at all anymore since I used fetch and readFile in the event listener. The
+    // Promise.all([
+    //     fetch(tracks).then(res => res.json()),
+    //     fetch(trackPoints).then(res => res.json())
+    // ]).then(([trackData, pointData]) => {
     // ------ Draw Route Polyline on Map ------
     const polyline = L.geoJSON(trackData, {
             style: { color: 'blue', weight: 4 }            
@@ -537,5 +624,4 @@ dropdown.addEventListener('change', function () {
     currentCharts.pace = paceChart;
     currentHandlers.elevation = handlers1;
     currentHandlers.pace = handlers2;
-});
-});
+}

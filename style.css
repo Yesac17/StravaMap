@@ -97,3 +97,8 @@ header {
     top: 0;
     z-index: 1000;
 }
+
+[value="file_upload"] {
+    font-style: italic;
+    color: #2c3e50;
+}
