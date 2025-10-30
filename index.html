@@ -28,25 +28,29 @@
                 <input type="file" id="folderInput" name="files[]" webkitdirectory directory multiple accept=".geojson,.gpx"><br> <!-- Allows file upload -->
             </form>
         </div>
-
-        <div id="map"></div>
-
-        <div id="info-panel">
+        <div id='mapandstats'>
             <div id="stats">
-                <h2>Run Statistics</h2>
-                <ul id="statBox" height="150", width="100">
-                    <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
-                    <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
-                    <li><b>Pace:</b> <span id = "pace">-</span> min/mi</li>
-                </ul>
+                    <h2>Run Statistics</h2>
+                    <ul>
+                        <li><b>Route Name:</b> <span id = "route-name">-</span></li>
+                        <li><b>Time:</b> <span id = "time">-</span></li>
+                        <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
+                        <li><b>Pace:</b> <span id = "pace">-</span> min/mi</li>
+                        <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
+                    </ul>
             </div>
 
-            <div id="pace-container">
+            <div id="map"></div>
+        </div>
+
+        <div id="charts">
+
+            <div id="pace-container" class="chart-container">
                 <h2>Pace Chart</h2>
                 <canvas id="paceChart" height="150", width="300"></canvas>
             </div>
 
-            <div id="elevation-container">
+            <div id="elevation-container" class="chart-container">
                 <h2>Elevation Profile</h2>
                 <canvas id="elevationChart" height="150", width="300"></canvas>
             </div>

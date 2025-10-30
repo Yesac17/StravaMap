@@ -89,15 +89,43 @@ const markerGroup = L.layerGroup().addTo(map);
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
 const fileInp = document.getElementById('folderInput');
 let fileList = [];
+let [trackDataUpload, pointDataUpload] = [];
 fileInp.addEventListener('change', async function(event) {
     fileList = event.target.files; // FileList object
     for (let i = 0; i < fileList.length; i++) {
         console.log(`File Name: ${fileList[i].name}, Size: ${fileList[i].size} bytes`);
     }
+    if(fileList.length < 2){
+            alert("Please upload two files: tracks.geojson and track_points.geojson");
+            return;
+        }
+
+        // Now I will use FileReader to read the contents of these files and use a Try Catch block to parse them as JSON
+        const readFile = file =>
+            new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(JSON.parse(reader.result));
+                reader.onerror = () => reject(reader.error);
+                reader.readAsText(file);
+            });
+        
+        try {
+            [trackDataUpload, pointDataUpload] = await Promise.all([
+                readFile(fileList[0]),
+                readFile(fileList[1])
+            ]);
+
+            console.log('Loaded uploaded files:', fileList[0].name, fileList[1].name);
+            loadRoute(trackDataUpload, pointDataUpload);
+        } catch (error) {
+            console.error('Error reading uploaded files:', error);
+            alert('Error reading uploaded files.');
+        }
 });
 
 const dropdown = document.getElementById('route');
 dropdown.addEventListener('change', async function () {
+    const fileInputDiv = document.getElementsByClassName('upload-container')
     routeGroup.clearLayers();
     markerGroup.clearLayers();
 
@@ -128,6 +156,7 @@ dropdown.addEventListener('change', async function () {
 
     let  tracks, trackPoints; 
     if(selectedValue !== 'file_upload'){
+            fileInputDiv[0].style.display = 'none';
             tracks = `routes/${selectedValue}/tracks.geojson`;
             trackPoints = `routes/${selectedValue}/track_points.geojson`;
 
@@ -138,44 +167,17 @@ dropdown.addEventListener('change', async function () {
             loadRoute(trackData, pointData);
     }
     else if(selectedValue === 'file_upload'){
-        // Handle file upload case here
-        // For example, read files from the input element and parse them
-        // Return appropriate GeoJSON data
-        // Alright so actually this doesn't work because you can't use fetch on local files, instead we must read the files directly with FileReader.
-        // tracks = fileList[0].name; 
-        // console.log(tracks);// Example: first file as tracks
-        // trackPoints = fileList[1].name;
-        // console.log(trackPoints); // Example: second file as track points
+        // I want the file upload option to be invisible unless the dropdown is set to file upload.
+        // To do this, I will add an event listener to the dropdown that shows/hides the file input based on the selected value.
 
-        // First I will make sure the user uploaded exactly two files
-        if(fileList.length < 2){
-            alert("Please upload two files: tracks.geojson and track_points.geojson");
-            return;
+        fileInputDiv[0].style.display = 'block';
+        // Now if a user selects file upload, the interface appears and they can upload files and then the route will apear.
+        // The only issue is if they switch to a different route and then back to file upload, they might expect the previous upload to still be there.
+        // But it will be gone since the event listener for file upload only triggers when files are selected and that is what triggers loadRoute.
+        // I will fix this by checking if trackDataUpload and pointDataUpload are already defined and if so, call loadRoute with those.
+        if(trackDataUpload && pointDataUpload){
+            loadRoute(trackDataUpload, pointDataUpload);
         }
-
-        // Now I will use FileReader to read the contents of these files and use a Try Catch block to parse them as JSON
-
-        const readFile = file =>
-            new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(JSON.parse(reader.result));
-                reader.onerror = () => reject(reader.error);
-                reader.readAsText(file);
-            });
-        
-        try {
-            const [trackData, pointData] = await Promise.all([
-                readFile(fileList[0]),
-                readFile(fileList[1])
-            ]);
-
-            console.log('Loaded uploaded files:', fileList[0].name, fileList[1].name);
-            loadRoute(trackData, pointData);
-        } catch (error) {
-            console.error('Error reading uploaded files:', error);
-            alert('Error reading uploaded files.');
-        }
-        
     }
 });
 // Ok now I have adjusted the code to read the uploaded files directly using FileReader and parse them as JSON. Now I will move the route loading logic into a separate function called loadRoute to avoid code duplication.
@@ -337,9 +339,19 @@ async function loadRoute(trackData, pointData) {
     const paceSec = paceDec * 60;
 
     // Update HTML Stats
+    // Wondering how to get route name. 
+    // the JSON looks like this: "type": "Feature", "properties": { "name": "Turkey", "type": "running" }, "geometry": { "type": "LineString", "coordinates":
+    // So I can get it from trackData.features[0]
+    document.getElementById("route-name").textContent = trackData.features[0].properties.name || 'Unnamed Route';
     document.getElementById("distance").textContent = (totalDist / 1.609).toFixed(2);
     document.getElementById("elevation").textContent = Math.round(totalElevGain *  3.28);
     document.getElementById("pace").textContent =  `${paceMin}:${paceSec.toFixed(0).padStart(2, '0')}`;
+
+    const hours = Math.floor(totalTimeSec / 3600);
+    const minutes = Math.floor((totalTimeSec % 3600) / 60);
+    const seconds = Math.round(totalTimeSec % 60);
+    const totalTime = `${hours > 0 ? hours + 'h ' : ''}${minutes}m ${seconds}s`;
+    document.getElementById("time").textContent = totalTime;
 
     
     // --- Map Popups on Click ---
