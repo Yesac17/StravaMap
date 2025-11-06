@@ -85,7 +85,7 @@ h1 {
 
 }
 
-#distance, #elevation, #pace {
+#distance, #elevation, #pace, #time, #route-name {
   font-weight: bold;
   color: #2c3e50;
 }
