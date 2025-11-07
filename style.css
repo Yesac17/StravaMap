@@ -43,14 +43,14 @@ h1 {
   align-items: flex-start;
 }
 
-.chart-container {
-    /* flex: 1; */
+.chart-container1, .chart-container2 {
+    flex: 1; 
     background: rgba(255, 255, 255, 0.5);
     border: #2c3e50 solid 2px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     
 }
-.chart-container:hover {
+.chart-container1:hover, .chart-container2:hover {
   transform: scale(1.01);
   transition: 0.2s ease;
 }
@@ -85,7 +85,7 @@ h1 {
 
 }
 
-#distance, #elevation, #pace, #time, #route-name {
+#distance, #elevation, #pace, #time, #route-name, #heartrate, #cadence {
   font-weight: bold;
   color: #2c3e50;
 }

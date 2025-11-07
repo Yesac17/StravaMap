@@ -39,6 +39,9 @@
                         <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
                         <li><b>Pace:</b> <span id = "pace">-</span> min/mi</li>
                         <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
+                        <li><b>Average Heart Rate:</b> <span id = "heartrate">-</span> bpm</li>
+                        <li><b>Average Cadence:</b> <span id = "cadence">-</span> spm</li>
+                        <li><b>Temperature:</b> <span id="temperature">-</span>°F</li>
                     </ul>
             </div>
 
@@ -47,14 +50,26 @@
 
         <div id="charts">
 
-            <div id="pace-container" class="chart-container">
-                <h2>Pace Chart</h2>
-                <canvas id="paceChart" height="150" width="300"></canvas>
+            <div id="pace-container" class="chart-container1">
+                <h2>Pace (min/mile)</h2>
+                <canvas id="paceChart" ></canvas>
             </div>
 
-            <div id="elevation-container" class="chart-container">
-                <h2>Elevation Profile</h2>
-                <canvas id="elevationChart" height="150" width="300"></canvas>
+            <div id="elevation-container" class="chart-container1">
+                <h2>Elevation (ft)</h2>
+                <canvas id="elevationChart"></canvas>
+            </div>
+        </div>
+        <div id="charts">
+
+            <div id="heartrate-container" class="chart-container2">
+                <h2>Heart Rate (bpm)</h2>
+                <canvas id="heartrateChart"></canvas>
+            </div>
+
+            <div id="cadence-container" class="chart-container2">
+                <h2>Cadence (spm)</h2>
+                <canvas id="cadenceChart"></canvas>
             </div>
         </div>
 

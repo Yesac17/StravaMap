@@ -88,8 +88,8 @@ const markerGroup = L.layerGroup().addTo(map);
     .addTo(map)
     .setStyle({ opacity: 0, fillOpacity: 0 });
 
-    let currentCharts = {elevation: null, pace: null};
-    let currentHandlers = {elevation: null, pace: null};
+    let currentCharts = {elevation: null, pace: null, hr: null, cad: null};
+    let currentHandlers = {elevation: null, pace: null, hr: null, cad: null};
 
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
 const fileInp = document.getElementById('folderInput');
@@ -156,8 +156,28 @@ dropdown.addEventListener('change', async function () {
         currentHandlers.pace = null;
     }
 
+    if (currentCharts.hr) {
+        if (currentCharts.hr.canvas && currentHandlers.hr?.hide) {
+            currentCharts.hr.canvas.removeEventListener('mouseleave', currentHandlers.hr.hide);
+        }
+        currentCharts.hr.destroy();
+        currentCharts.hr = null;
+        currentHandlers.hr = null;
+    }
+
+    if (currentCharts.cad) {
+        if (currentCharts.cad.canvas && currentHandlers.cad?.hide) {
+            currentCharts.cad.canvas.removeEventListener('mouseleave', currentHandlers.cad.hide);
+        }
+        currentCharts.cad.destroy();
+        currentCharts.cad = null;
+        currentHandlers.cad = null;
+    }
+
+    
+
     // clear stored handlers
-    currentHandlers = {elevation: null, pace: null};
+    currentHandlers = {elevation: null, pace: null, hr: null, cad: null};
 
     const selectedValue = dropdown.value;
     if (!selectedValue) return;
@@ -227,7 +247,7 @@ async function loadRoute(trackData, pointData) {
 
     let isSyncing = false;
 
-    function makeSyncHandlers(sourceChart, targetChart, coords) {
+function makeSyncHandlers(sourceChart, targetChart, coords) {
   // clear/hide everything (used by external/onHover and by mouseleave)
   function hideAll() {
     // hide hover marker & popup
@@ -357,6 +377,15 @@ async function loadRoute(trackData, pointData) {
     document.getElementById("distance").textContent = (totalDist / 1.609).toFixed(2);
     document.getElementById("elevation").textContent = Math.round(totalElevGain *  3.28);
     document.getElementById("pace").textContent =  `${paceMin}:${paceSec.toFixed(0).padStart(2, '0')}`;
+
+    // Compute average heart rate and cadence
+    const hrValues = coords.filter(c => c.hr).map(c => parseInt(c.hr));
+    const avgHr = hrValues.reduce((a,b) => a + b, 0) / hrValues.length;
+    document.getElementById("heartrate").textContent = avgHr ? Math.round(avgHr) : 'n/a';
+
+    const cadValues = coords.filter(c => c.cad).map(c => parseInt(c.cad));
+    const avgCad = cadValues.reduce((a,b) => a + b, 0) / cadValues.length;
+    document.getElementById("cadence").textContent = avgCad ? Math.round(avgCad) : 'n/a';
 
     const hours = Math.floor(totalTimeSec / 3600);
     const minutes = Math.floor((totalTimeSec % 3600) / 60);
@@ -625,6 +654,147 @@ async function loadRoute(trackData, pointData) {
         },
         plugins: [crosshairPlugin]
     });
+
+    // -- Heart Rate Chart ---
+    const hrData = [];
+    const hrLabels = [];
+    cumulativeDist = 0;
+
+    for(let i = 1; i < coords.length; i++) {
+        const prev = coords[i-1];
+        const curr = coords[i];
+        const segmentDistKm = haversine(prev,curr)
+        cumulativeDist += segmentDistKm;
+        if (curr.hr) {
+            hrData.push(curr.hr);
+            hrLabels.push((cumulativeDist / 1.609).toFixed(2));
+        }
+    }
+
+    const hrCtx = document.getElementById('heartrateChart').getContext('2d');
+    const hrChart = new Chart(hrCtx, {
+        type: 'line',
+        data: {
+            labels: hrLabels,
+            datasets: [{
+                label: 'Heart Rate (bpm)',
+                data: hrData,
+                fill: false,
+                borderColor: 'red',
+                backgroundColor: 'red',
+                borderWidth: 1.5,
+                tension: 0.3,
+                pointRadius: 0,
+            }]
+        },
+        options: {
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {display: false},
+                crosshairLine: true
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Distance (mi)'
+                    },
+                    type: 'linear',
+                    min: 0,
+                    ticks: {
+                        stepSize: 1,
+                        beginAtZero: true,
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Heart Rate (bpm)'
+                    }
+                }
+            }
+        },
+        plugins: [crosshairPlugin]
+    });
+
+
+    // --- Cadence Chart ---
+    const cadData = [];
+    const cadLabels = [];
+    cumulativeDist = 0;
+    for(let i = 1; i < coords.length; i++) {
+        const prev = coords[i-1];
+        const curr = coords[i];
+        const segmentDistKm = haversine(prev,curr)
+        cumulativeDist += segmentDistKm;
+        if (curr.cad) {
+            cadData.push(curr.cad);
+            cadLabels.push((cumulativeDist / 1.609).toFixed(2));
+        }
+    }
+
+    const cadCtx = document.getElementById('cadenceChart').getContext('2d');
+    const cadChart = new Chart(cadCtx, {
+        type: 'line',
+        data: {
+            labels: cadLabels,
+            datasets: [{
+                label: 'Cadence (spm)',
+                data: cadData,
+                fill: false,
+                borderColor: 'green',
+                backgroundColor: 'green',
+                borderWidth: 1.5,
+                tension: 0.3,
+                pointRadius: 0,
+            }]
+        },
+        options: {
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {display: false},
+                crosshairLine: true
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Distance (mi)'
+                    },
+                    type: 'linear',
+                    min: 0,
+                    ticks: {
+                        stepSize: 1,
+                        beginAtZero: true,
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Cadence (spm)'
+                    }
+                }
+            }
+        },
+        plugins: [crosshairPlugin]
+    });
+
+    // To display both charts on the web page, I have to link them via hover sync.
+    // Is it possible to just add these two new charts to the same handlers?
+    // Below I have handlers1 and handlers2 that link elevationChart and paceChart.
+    // If i want these two new charts to link to the already existing charts, I can just
+
+
+
+
+
+
     // // --- Link both charts via hover sync ---
     // elevationChart.options.plugins.tooltip.external = 
     //     handleTooltipSync(elevationChart, paceChart, coords);
@@ -632,20 +802,34 @@ async function loadRoute(trackData, pointData) {
     //     handleTooltipSync(paceChart, elevationChart, coords);
     // });
 
-        // create handlers after you construct both charts
+        // create handlers after you construct all charts
     const handlers1 = makeSyncHandlers(elevationChart, paceChart, coords);
     const handlers2 = makeSyncHandlers(paceChart, elevationChart, coords);
+    const handlers3 = makeSyncHandlers(hrChart, cadChart, coords);
+    const handlers4 = makeSyncHandlers(cadChart, hrChart, coords);
 
     // Hybrid setup (reliable): one chart uses external, the other uses onHover
     elevationChart.options.plugins.tooltip.external = handlers1.external;
     paceChart.options.onHover = handlers2.onHover;
+    hrChart.options.plugins.tooltip.external = handlers3.external;
+    cadChart.options.onHover = handlers4.onHover;
 
     if (elevationChart.canvas) { elevationChart.canvas.addEventListener('mouseleave', handlers1.hide); }
     if (paceChart.canvas) { paceChart.canvas.addEventListener('mouseleave', handlers2.hide); }
+    if (hrChart.canvas) { hrChart.canvas.addEventListener('mouseleave', handlers3.hide); }
+    if (cadChart.canvas) { cadChart.canvas.addEventListener('mouseleave', handlers4.hide); }
 
     // store current charts and handlers for later cleanup
     currentCharts.elevation =elevationChart;
     currentCharts.pace = paceChart;
     currentHandlers.elevation = handlers1;
     currentHandlers.pace = handlers2;
+    currentCharts.hr = hrChart;
+    currentHandlers.hr = handlers3;
+    currentCharts.cad = cadChart;
+    currentHandlers.cad = handlers4;
+    // How does this look? I think it is correct. Lets test it out.
+    
+    //Alright so the new charts sync with the map but not any of the other charts.
+    //This is because 
 }
