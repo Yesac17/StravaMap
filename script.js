@@ -14,31 +14,32 @@
 // ==================== 1. MAP INITIALIZATION ====================
 const map = L.map('map', {
     center: [44.8765, -91.9207],
-    WorldCopyJump: true,
+    worldCopyJump: true,
     zoom: 7
 });
 
+
 // Add OpenStreetMap tiles Layer
-var openStreetMaps = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+const openStreetMaps = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'Map data © OpenStreetMap contributors'
 });
 
-var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+const googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
 maxZoom: 20,
 subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
 });
 
-var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+const googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3']
 });
 
-var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
+const googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{
         maxZoom: 20,
         subdomains:['mt0','mt1','mt2','mt3']
 });
 
-var baseMaps = {
+const baseMaps = {
     "OpenStreetMap": openStreetMaps,
     "Google Satellite": googleSat,
     "Google Hybrid": googleHybrid,
@@ -51,7 +52,11 @@ openStreetMaps.addTo(map);
 
 // Compute squared distance between two points (used for nearest-point lookup)
 function distanceSq(a,b) {
-            return (a.lat - b.lat) ** 2 + (a.lon - b.lon) ** 2;
+            const aLat = a.lat ?? a.latitude;
+            const aLon = a.lon ?? a.lng ?? a.longitude;
+            const bLat = b.lat ?? b.latitude;
+            const bLon = b.lon ?? b.lng ?? b.longitude;
+            return (aLat - bLat) ** 2 + (aLon - bLon) ** 2;
         }
 
  // Great-circle distance using the Haversine formula (returns km)
@@ -89,12 +94,13 @@ const markerGroup = L.layerGroup().addTo(map);
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
 const fileInp = document.getElementById('folderInput');
 let fileList = [];
-let [trackDataUpload, pointDataUpload] = [];
+let trackDataUpload = null;
+let pointDataUpload = null;
 fileInp.addEventListener('change', async function(event) {
     fileList = event.target.files; // FileList object
-    for (let i = 0; i < fileList.length; i++) {
-        console.log(`File Name: ${fileList[i].name}, Size: ${fileList[i].size} bytes`);
-    }
+    // for (let i = 0; i < fileList.length; i++) {
+    //     console.log(`File Name: ${fileList[i].name}, Size: ${fileList[i].size} bytes`);
+    // }
     if(fileList.length < 2){
             alert("Please upload two files: tracks.geojson and track_points.geojson");
             return;
@@ -115,7 +121,7 @@ fileInp.addEventListener('change', async function(event) {
                 readFile(fileList[1])
             ]);
 
-            console.log('Loaded uploaded files:', fileList[0].name, fileList[1].name);
+            // console.log('Loaded uploaded files:', fileList[0].name, fileList[1].name);
             loadRoute(trackDataUpload, pointDataUpload);
         } catch (error) {
             console.error('Error reading uploaded files:', error);
@@ -135,17 +141,19 @@ dropdown.addEventListener('change', async function () {
     // Destroy existing charts if any
     if (currentCharts.elevation) {
         if (currentCharts.elevation.canvas && currentHandlers.elevation?.hide) {
-            currentCharts.elevation.canvas.addEventListener('mouseleave', currentHandlers.elevation.hide);
+            currentCharts.elevation.canvas.removeEventListener('mouseleave', currentHandlers.elevation.hide);
         }
         currentCharts.elevation.destroy();
         currentCharts.elevation = null;
+        currentHandlers.elevation = null;
     }
     if (currentCharts.pace) {
         if (currentCharts.pace.canvas && currentHandlers.pace?.hide) {
-            currentCharts.pace.canvas.addEventListener('mouseleave', currentHandlers.pace.hide);
+            currentCharts.pace.canvas.removeEventListener('mouseleave', currentHandlers.pace.hide);
         }
         currentCharts.pace.destroy();
         currentCharts.pace = null;
+        currentHandlers.pace = null;
     }
 
     // clear stored handlers
@@ -201,7 +209,8 @@ async function loadRoute(trackData, pointData) {
             const ele = f.properties.ele; //* 3.28
             const time = new Date(f.properties.time);
             const hr = extractFromExtension(f.properties.gpxtpx_TrackPointExtension || '', 'hr');
-            return { lat, lon, ele, time, hr};
+            const cad = extractFromExtension(f.properties.gpxtpx_TrackPointExtension || '', 'cad') * 2; // convert to steps per minute
+            return { lat, lon, ele, time, hr, cad };
     });
 
     // Compute Cumulative Distance (in miles)
@@ -253,8 +262,10 @@ async function loadRoute(trackData, pointData) {
       <b>Distance:</b> ${nearest.distanceMi.toFixed(2)} mi<br>
       <b>Elevation:</b> ${(nearest.ele * 3.28084).toFixed(0)} ft<br>
       <b>Time:</b> ${nearest.time.toLocaleTimeString()}<br>
-      <b>Heart Rate:</b> ${nearest.hr || 'n/a'} bpm
+      <b>Heart Rate:</b> ${nearest.hr || 'n/a'} bpm<br>
+      <b>Cadence:</b> ${nearest.cad || 'n/a'} spm
     `).openPopup();
+
 
     // highlight matching index on target chart and show tooltip there
     const matchIndex = targetChart.data.labels.findIndex(l => Math.abs(parseFloat(l) - hoveredDist) < 0.01);
@@ -370,12 +381,13 @@ async function loadRoute(trackData, pointData) {
             const hr = nearest.hr;
 
             popup
-                .setLatLng(latlng)
+                .setLatLng([nearest.lat, nearest.lon])
                 .setContent( `
                 <b>Distance:</b> ${nearest.distanceMi.toFixed(2)} mi<br>
                 <b>Elevation:</b> ${elevationFt} ft<br>
                 <b>Time:</b> ${timeStr} <br>
-                <b>Heart Rate:</b> ${hr || 'n/a'} bpm
+                <b>Heart Rate:</b> ${hr || 'n/a'} bpm<br>
+                <b>Cadence:</b> ${nearest.cad || 'n/a'} spm
                 `)
                 .openOn(map);
     });

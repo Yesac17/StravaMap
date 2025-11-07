@@ -6,7 +6,9 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
         <link rel="stylesheet" href="style.css">
     </head>
-    <header>
+    
+    <body>
+        <header>
             <h1>Running Routes Maps</h1>
 
             <div id="route-selection">
@@ -20,7 +22,7 @@
                     </select>
             </div>
         </header>
-    <body>
+    
         <div class="upload-container">
             <!-- enctype is required for file uploads -->
             <form action="/upload" method="POST" enctype="multipart/form-data">
@@ -47,12 +49,12 @@
 
             <div id="pace-container" class="chart-container">
                 <h2>Pace Chart</h2>
-                <canvas id="paceChart" height="150", width="300"></canvas>
+                <canvas id="paceChart" height="150" width="300"></canvas>
             </div>
 
             <div id="elevation-container" class="chart-container">
                 <h2>Elevation Profile</h2>
-                <canvas id="elevationChart" height="150", width="300"></canvas>
+                <canvas id="elevationChart" height="150" width="300"></canvas>
             </div>
         </div>
 

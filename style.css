@@ -43,7 +43,7 @@ h1 {
   align-items: flex-start;
 }
 
-.chart_container {
+.chart-container {
     /* flex: 1; */
     background: rgba(255, 255, 255, 0.5);
     border: #2c3e50 solid 2px;
