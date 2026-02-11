@@ -85,9 +85,18 @@ h1 {
 
 }
 
-#distance, #elevation, #pace, #time, #route-name, #heartrate, #cadence {
+#distance, #elevation, #pace, #time, #route-name, #heartrate, #cadence, #temperature, #date, #start-time {
   font-weight: bold;
   color: #2c3e50;
+}
+
+#milemarkercheck {
+    text-align: right;
+    padding: 0 25%;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #2c3e50;
+    font-weight: bold;
 }
 
 #elevation-container {

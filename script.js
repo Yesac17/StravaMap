@@ -174,7 +174,7 @@ dropdown.addEventListener('change', async function () {
         currentHandlers.cad = null;
     }
 
-    
+
 
     // clear stored handlers
     currentHandlers = {elevation: null, pace: null, hr: null, cad: null};
@@ -230,7 +230,8 @@ async function loadRoute(trackData, pointData) {
             const time = new Date(f.properties.time);
             const hr = extractFromExtension(f.properties.gpxtpx_TrackPointExtension || '', 'hr');
             const cad = extractFromExtension(f.properties.gpxtpx_TrackPointExtension || '', 'cad') * 2; // convert to steps per minute
-            return { lat, lon, ele, time, hr, cad };
+            const temp = extractFromExtension(f.properties.gpxtpx_TrackPointExtension || '', 'atemp');
+            return { lat, lon, ele, time, hr, cad, temp };
     });
 
     // Compute Cumulative Distance (in miles)
@@ -393,6 +394,26 @@ function makeSyncHandlers(sourceChart, targetChart, coords) {
     const totalTime = `${hours > 0 ? hours + 'h ' : ''}${minutes}m ${seconds}s`;
     document.getElementById("time").textContent = totalTime;
 
+    for (let i = 0; i < coords.length; i++) {
+        if (coords[i].temp) {
+            coords[i].tempF = (parseFloat(coords[i].temp) * 9/5) + 32;
+        }
+    }
+    const tempValues = coords.filter(c => c.tempF).map(c => c.tempF);
+    const avgTemp = tempValues.reduce((a,b) => a + b, 0) / tempValues.length;
+    document.getElementById("temperature").textContent = avgTemp ? Math.round(avgTemp) : 'n/a';
+
+    // track_points.geojson has property "time": "2025-05-22T14:30:09Z". 
+    // I can use this to get the date and start time of the run. However the time zone is probably UTC so I need to convert it to local time.
+    // I will only display the date that the activity started on, so I will only need the data from the first coordinate.
+    const startTime = coords[0].time;
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById("date").textContent = startTime.toLocaleDateString(undefined, options);
+    
+    // Next I wish to display the start time in local time.
+    // I will use toLocaleTimeString for this.
+    document.getElementById("start-time").textContent = startTime.toLocaleTimeString();
+
     
     // --- Map Popups on Click ---
     const popup = L.popup();
@@ -457,6 +478,18 @@ function makeSyncHandlers(sourceChart, targetChart, coords) {
             mileCount++;
         }
     }
+    // I have just added a check box in the html
+    // I want to link this checkbox to the mile markers so that when the box is checked, the mile markers appear and when it is unchecked, they disappear.
+    // To do this, I will add an event listener to the checkbox that toggles the visibility of the markerGroup layer.
+    const mileMarkerCheckbox = document.getElementById('mileMarkers'); // This line is doing the following: it is getting the checkbox element from the HTML document by its ID 'mileMarkers' and storing it in the variable mileMarkerCheckbox for later use in the event listener.
+    mileMarkerCheckbox.addEventListener('change', function() { // This line is adding an event listener to the mileMarkerCheckbox that listens for the 'change' event, which occurs when the checkbox is checked or unchecked. When the event is triggered, it executes the function that follows.
+        if (this.checked) { // This line is checking if the checkbox is currently checked (i.e., if this.checked is true). If it is checked, it executes the code block that follows, which adds the markerGroup layer to the map, making the mile markers visible. If it is not checked, it executes the else block, which removes the markerGroup layer from the map, hiding the mile markers.
+            map.addLayer(markerGroup);
+        } else {
+            map.removeLayer(markerGroup);
+        }
+    });
+    // I would like the checkbox to default to true
     
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
