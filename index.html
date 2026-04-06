@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>My Running Routes</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link rel="stylesheet" href="style.css">
+    </head>
+    
+    <body>
+        <header>
+            <h1>Running Routes Maps</h1>
+
+            <div id="route-selection">
+                <label for="Route">Choose a Route:</label>
+                    <select id="route" name="Route">
+                        <option value="">-- Select a Route --</option>
+                        <option value="Turkey">Turkey</option>
+                        <option value="Marathon">Marathon</option>
+                        <option value="puddle_jumping">Puddle Jumping</option>
+                        <option value="file_upload">File Upload</option>
+                    </select>
+            </div>
+        </header>
+    
+        <div class="upload-container">
+            <!-- enctype is required for file uploads -->
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <label for="fileInput">Choose file(s):</label><br>
+                <input type="file" id="folderInput" name="files[]" webkitdirectory directory multiple accept=".geojson,.gpx"><br> <!-- Allows file upload -->
+            </form>
+        </div>
+        <div id='mapandstats'>
+            <div id="stats">
+                    <h2>Run Statistics</h2>
+                    <ul>
+                        <li><b>Date:</b><span id = "date">-</span> at <span id ="start-time">-</span></li>
+                        <li><b>Route Name:</b> <span id = "route-name">-</span></li>
+                        <li><b>Time:</b> <span id = "time">-</span></li>
+                        <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
+                        <li><b>Avg Pace:</b> <span id = "pace">-</span> min/mi</li>
+                        <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
+                        <li><b>Avg Heart Rate:</b> <span id = "heartrate">-</span> bpm</li>
+                        <li><b>Avg Cadence:</b> <span id = "cadence">-</span> spm</li>
+                        <li><b>Temperature:</b> <span id="temperature">-</span>°F</li>
+                    </ul>
+            </div>
+
+            <div id="map"></div>
+        </div>
+
+        <div id='milemarkercheck'>
+                <label for="mileMarkers">Show Mile Markers:</label>
+                <input type="checkbox" id="mileMarkers" name="mileMarkers" checked>
+            </div>
+
+        <div id="charts">
+
+            <div id="pace-container" class="chart-container1">
+                <h2>Pace (min/mile)</h2>
+                <canvas id="paceChart" ></canvas>
+            </div>
+
+            <div id="elevation-container" class="chart-container1">
+                <h2>Elevation (ft)</h2>
+                <canvas id="elevationChart"></canvas>
+            </div>
+        </div>
+        <div id="charts">
+
+            <div id="heartrate-container" class="chart-container2">
+                <h2>Heart Rate (bpm)</h2>
+                <canvas id="heartrateChart"></canvas>
+            </div>
+
+            <div id="cadence-container" class="chart-container2">
+                <h2>Cadence (spm)</h2>
+                <canvas id="cadenceChart"></canvas>
+            </div>
+        </div>
+
+        
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
