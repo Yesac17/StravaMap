@@ -118,29 +118,12 @@ fileInp.addEventListener('change', async function(event) {
     });
 
     const data = await res.json();
+
+    const trackData = await fetch(data.trackUrl).then(res => res.json()); // I am getting a 403 forbidden error, 
+    const pointData = await fetch(data.pointUrl).then(res => res.json());
+
     console.log(data);
-
-        // Now I will use FileReader to read the contents of these files and use a Try Catch block to parse them as JSON
-        // const readFile = file =>
-            // new Promise((resolve, reject) => {
-            //     const reader = new FileReader();
-            //     reader.onload = () => resolve(JSON.parse(reader.result));
-            //     reader.onerror = () => reject(reader.error);
-            //     reader.readAsText(file);
-            // });
-        
-        // try {
-        //     [trackDataUpload, pointDataUpload] = await Promise.all([
-        //         readFile(fileList[0]),
-        //         readFile(fileList[1])
-        //     ]);
-
-        //     // console.log('Loaded uploaded files:', fileList[0].name, fileList[1].name);
-        //     loadRoute(trackDataUpload, pointDataUpload);
-        // } catch (error) {
-        //     console.error('Error reading uploaded files:', error);
-        //     alert('Error reading uploaded files.');
-        // }
+    loadRoute(trackData, pointData);
 }); 
 const dropdown = document.getElementById('route');
 dropdown.addEventListener('change', async function () {
