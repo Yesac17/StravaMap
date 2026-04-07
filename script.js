@@ -98,9 +98,6 @@ let trackDataUpload = null;
 let pointDataUpload = null;
 fileInp.addEventListener('change', async function(event) {
     // this function handles fileinput when user selects the file input dropdown. 
-    // I am implementing multer with my server.js and want to test file upload with that instead.
-    // to do this I will need to adjust this function.
-
     fileList = event.target.files; // FileList object
     if(fileList.length < 2){
             alert("Please upload two files: tracks.geojson and track_points.geojson");
@@ -117,13 +114,14 @@ fileInp.addEventListener('change', async function(event) {
         body: formData
     });
 
-    const data = await res.json();
+    // I no longer want to display the route while file upload is selected, just add the new file to the dropdown. 
+    // const data = await res.json();
 
-    const trackData = await fetch(data.trackUrl).then(res => res.json());
-    const pointData = await fetch(data.pointUrl).then(res => res.json());
+    // const trackData = await fetch(data.trackUrl).then(res => res.json());
+    // const pointData = await fetch(data.pointUrl).then(res => res.json());
 
-    console.log(data);
-    loadRoute(trackData, pointData);
+    // console.log(data);
+    // loadRoute(trackData, pointData);
 }); 
 
 async function loadSavedRoutes() {
@@ -194,13 +192,16 @@ dropdown.addEventListener('change', async function () {
     const selectedValue = dropdown.value;
     if (!selectedValue) return;
 
-    let  tracks, trackPoints; 
+    let  tracks, trackPoints;
+    // if the selected value is not file upload, then fetch the route data from the server and load the route.
+    // if the selected value is file upload, then show the file upload interface and wait for the user to upload files. 
     if(selectedValue !== 'file_upload'){
             fileInputDiv[0].style.display = 'none';
-            //tracks = `routes/${selectedValue}/tracks.geojson`;
-            tracks = "https://cdb-interactivemap.s3.us-east-2.amazonaws.com/routes/tracks.geojson";
-            //trackPoints = `routes/${selectedValue}/track_points.geojson`;
-            trackPoints = "https://cdb-interactivemap.s3.us-east-2.amazonaws.com/routes/track_points.geojson";
+            const res = await fetch(`http://localhost:3000/routes/${selectedValue}`);
+            const route = await res.json();
+
+            const tracks = route.trackUrl;
+            const trackPoints = route.pointUrl;
 
             const [trackData, pointData] = await Promise.all([
                 fetch(tracks).then(res => res.json()),
@@ -208,22 +209,11 @@ dropdown.addEventListener('change', async function () {
             ]);
             loadRoute(trackData, pointData);
     }
+    // Once the files are uploaded, load the route using the uploaded data
     else if(selectedValue === 'file_upload'){
-        // I want the file upload option to be invisible unless the dropdown is set to file upload.
-        // To do this, I will add an event listener to the dropdown that shows/hides the file input based on the selected value.
-
-        fileInputDiv[0].style.display = 'block';
-        // Now if a user selects file upload, the interface appears and they can upload files and then the route will apear.
-        // The only issue is if they switch to a different route and then back to file upload, they might expect the previous upload to still be there.
-        // But it will be gone since the event listener for file upload only triggers when files are selected and that is what triggers loadRoute.
-        // I will fix this by checking if trackDataUpload and pointDataUpload are already defined and if so, call loadRoute with those.
-        if(trackDataUpload && pointDataUpload){
-            loadRoute(trackDataUpload, pointDataUpload);
-        }
+        fileInputDiv[0].style.display = 'block'; // show file upload interface if file upload is selected
     }
 });
-// Ok now I have adjusted the code to read the uploaded files directly using FileReader and parse them as JSON. Now I will move the route loading logic into a separate function called loadRoute to avoid code duplication.
-// Wondering if I need to keep this promise.all here. The answer is no, I can move it into the loadRoute function. I will do that now.
 
 async function loadRoute(trackData, pointData) {
 // Did I do this right? I'm pretty sure i dont need this promise.all at all anymore since I used fetch and readFile in the event listener. The answer is 
