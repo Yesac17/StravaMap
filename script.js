@@ -119,13 +119,29 @@ fileInp.addEventListener('change', async function(event) {
 
     const data = await res.json();
 
-    const trackData = await fetch(data.trackUrl).then(res => res.json()); // I am getting a 403 forbidden error, 
+    const trackData = await fetch(data.trackUrl).then(res => res.json());
     const pointData = await fetch(data.pointUrl).then(res => res.json());
 
     console.log(data);
     loadRoute(trackData, pointData);
 }); 
+
+async function loadSavedRoutes() {
+    const res = await fetch("http://localhost:3000/routes");
+    const routes = await res.json();
+
+    // loop through routes
+    for (const route of routes) {
+        const option = document.createElement('option');
+        option.value = route.id;
+        option.textContent = route.name;
+        dropdown.appendChild(option);
+    }
+}
+
 const dropdown = document.getElementById('route');
+loadSavedRoutes();
+
 dropdown.addEventListener('change', async function () {
     const fileInputDiv = document.getElementsByClassName('upload-container')
     routeGroup.clearLayers();
@@ -210,7 +226,7 @@ dropdown.addEventListener('change', async function () {
 // Wondering if I need to keep this promise.all here. The answer is no, I can move it into the loadRoute function. I will do that now.
 
 async function loadRoute(trackData, pointData) {
-// Did I do this right? I'm pretty sure i dont need this promise.all at all anymore since I used fetch and readFile in the event listener. The
+// Did I do this right? I'm pretty sure i dont need this promise.all at all anymore since I used fetch and readFile in the event listener. The answer is 
     // Promise.all([
     //     fetch(tracks).then(res => res.json()),
     //     fetch(trackPoints).then(res => res.json())
