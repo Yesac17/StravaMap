@@ -68,6 +68,7 @@ app.post("/upload", upload.array("files"), async (req, res) => {
         let pointUrl = null;
         let trackKey = null;
         let pointKey = null;
+        let routeName = "Uploaded Route";
 
         for (const file of req.files) {
             const key = `routes/${Date.now()}-${file.originalname}`;
@@ -88,6 +89,10 @@ app.post("/upload", upload.array("files"), async (req, res) => {
             if (file.originalname === "tracks.geojson") {
                 trackUrl = signedUrl;
                 trackKey = key;
+                const json = JSON.parse(file.buffer.toString());
+                if (json.features && json.features.length > 0) {
+                    routeName = json.features[0].properties.name || routeName;
+                }
             } else if (file.originalname === "track_points.geojson") {
                 pointUrl = signedUrl;
                 pointKey = key;
@@ -100,7 +105,7 @@ app.post("/upload", upload.array("files"), async (req, res) => {
         // Also will want to get the actual name from the file later, but for now just use a placeholder name.
         const newRoute = { // 
             id: Date.now().toString(),
-            name: "Uploaded Route",
+            name: routeName,
             trackKey: trackKey,
             pointKey: pointKey,
             uploadedAt: new Date().toISOString()
