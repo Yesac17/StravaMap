@@ -146,6 +146,7 @@ dropdown.addEventListener('change', async function () {
     const fileInputDiv = document.getElementsByClassName('upload-container')
     routeGroup.clearLayers();
     markerGroup.clearLayers();
+    fileInputDiv[0].style.display = 'none';
 
     hoverMarker.setStyle({ opacity: 0, fillOpacity: 0 });
     if (hoverMarker.isPopupOpen && hoverMarker.isPopupOpen()) hoverMarker.closePopup();
@@ -194,11 +195,13 @@ dropdown.addEventListener('change', async function () {
     const selectedValue = dropdown.value;
     if (!selectedValue) return;
 
+    map.center = [44.8765, -91.9207];
+    map.zoom = 7;
+
 
     // if the selected value is not file upload, then fetch the route data from the server and load the route.
     // if the selected value is file upload, then show the file upload interface and wait for the user to upload files. 
     if(selectedValue !== 'file_upload'){
-            fileInputDiv[0].style.display = 'none';
             const res = await fetch(`http://localhost:3000/routes/${selectedValue}`);
             const route = await res.json();
 
