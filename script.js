@@ -138,6 +138,7 @@ async function loadSavedRoutes() {
 }
 
 const dropdown = document.getElementById('route');
+const deleteButton = document.getElementById('deleteRoute');
 loadSavedRoutes();
 
 dropdown.addEventListener('change', async function () {
@@ -214,6 +215,25 @@ dropdown.addEventListener('change', async function () {
         fileInputDiv[0].style.display = 'block'; // show file upload interface if file upload is selected
     }
 });
+
+deleteButton.addEventListener('click', async function() {
+    const selectedValue = dropdown.value;
+    if (!selectedValue) {
+        alert("Please select a route to delete.");
+        return;
+    } else if (selectedValue === 'file_upload') {
+        alert("Cannot delete 'File Upload' option. Please select a saved route to delete.");
+        return;
+    } else if(confirm("Are you sure you want to delete this route? This action cannot be undone.")) {
+        deleteRoute(selectedValue);
+    }
+    
+});
+
+async function deleteRoute(routeId) {
+    await fetch(`http://localhost:3000/routes/${routeId}`, { method: "DELETE" });
+}
+
 
 async function loadRoute(trackData, pointData) {
 // Did I do this right? I'm pretty sure i dont need this promise.all at all anymore since I used fetch and readFile in the event listener. The answer is 

@@ -141,6 +141,11 @@ h1 {
     margin-bottom: 1rem;
 }
 
+#route-delete {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
 header {
     background: rgba(212, 70, 19, 0.649);
     padding: 1rem 0;

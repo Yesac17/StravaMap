@@ -62,6 +62,30 @@ app.get("/routes/:id", async (req, res) => {
     }
 });
 
+app.delete("/routes/:id", async (req, res) => {
+    const routes = await getRoutes();
+    const route = routes.findIndex(r => r.id === req.params.id);
+    if (route !== -1) { // if the route is found, delete it from the array and save the updated array back to the file.
+        console.log(`Deleting route with id: ${req.params.id}`);
+
+        await s3.deleteObject({
+            Bucket: "cdb-interactivemap",
+            Key: routes[route].trackKey
+        }).promise();
+
+        await s3.deleteObject({
+            Bucket: "cdb-interactivemap",
+            Key: routes[route].pointKey
+        }).promise();
+
+        const updateRoutes = routes.filter(r => r.id !== req.params.id);
+        await saveRoutes(updateRoutes);
+        res.json({ message: "Route deleted successfully" });
+        } else {
+        res.status(404).json({ error: "Route not found" });
+    }
+});
+
 app.post("/upload", upload.array("files"), async (req, res) => {
     try {
         let trackUrl = null;
