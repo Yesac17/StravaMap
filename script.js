@@ -131,7 +131,7 @@ async function loadSavedRoutes() {
     // loop through routes
     for (const route of routes) {
         const option = document.createElement('option');
-        option.value = route.id;
+        option.value = route.route_id; 
         option.textContent = route.name;
         dropdown.appendChild(option);
     }
