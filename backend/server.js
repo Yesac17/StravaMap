@@ -93,6 +93,7 @@ app.delete("/routes/:id", async (req, res) => { // This endpoint will delete a r
                 route_id: routes[route].route_id
             }
         }).promise();
+        res.json({ message: "Route deleted successfully" });
     } else {
         res.status(404).json({ error: "Route not found" });
     }
@@ -116,12 +117,6 @@ app.post("/upload", upload.array("files"), async (req, res) => {
                 ContentType: file.mimetype,
             }).promise();
 
-            // const signedUrl = s3.getSignedUrl("getObject", {
-            //     Bucket: "cdb-interactivemap",
-            //     Key: key,
-            //     Expires: 60 * 60, // URL expires in 1 hour
-            // });
-
             if (file.originalname === "tracks.geojson") {
                 trackKey = key;
                 const json = JSON.parse(file.buffer.toString());
@@ -133,11 +128,7 @@ app.post("/upload", upload.array("files"), async (req, res) => {
             }
         }
 
-        // const routes = await getRoutes();
-
-
-        // This is a placeholder for the new route object that will be created after a successful upload. Later will store in DynamoDB or some other database, but for now just log it to the console.
-        const newRoute = { // 
+        const newRoute = { // Creating a new route object to be stored in DynamoDB.
             route_id: Date.now().toString(),
             name: routeName,
             trackKey: trackKey,
@@ -149,22 +140,11 @@ app.post("/upload", upload.array("files"), async (req, res) => {
             TableName: TABLE_NAME,
             Item: newRoute
         }).promise();
-
-        // routes.push(newRoute);
-        // await saveRoutes(routes);
-
-        // res.json({ 
-        //     message: "Files recieved succesfully",
-        //     trackUrl,
-        //     pointUrl,
-        //     fileCount: req.files.length
-        // });
-
+        res.json({ message: "Files uploaded successfully", route: newRoute });
     } catch (error) {
         console.error("Error uploading files:", error);
         res.status(500).json({ error: "Failed to upload files" });
     }
-
 });
 
 app.listen(3000, () => {

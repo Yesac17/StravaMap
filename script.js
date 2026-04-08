@@ -97,44 +97,45 @@ let fileList = [];
 let trackDataUpload = null;
 let pointDataUpload = null;
 fileInp.addEventListener('change', async function(event) {
-    // this function handles fileinput when user selects the file input dropdown. 
+    // this function handles fileinput. 
     fileList = event.target.files; // FileList object
-    if(fileList.length < 2){
+    if(fileList.length < 2){ // Check if both required files are uploaded
             alert("Please upload two files: tracks.geojson and track_points.geojson");
             return;
         }
     const formData = new FormData();
 
-    for (let file of fileList) {
+    for (let file of fileList) { // Loop through the FileList and append each file to the FormData object
         formData.append("files", file);
     }
 
-    const res = await fetch("http://localhost:3000/upload", {
+    const res = await fetch("http://localhost:3000/upload", { // Send the FormData to the server using fetch API
         method: "POST",
         body: formData
     });
-
-    // I no longer want to display the route while file upload is selected, just add the new file to the dropdown. 
-    // const data = await res.json();
-
-    // const trackData = await fetch(data.trackUrl).then(res => res.json());
-    // const pointData = await fetch(data.pointUrl).then(res => res.json());
-
-    // console.log(data);
-    // loadRoute(trackData, pointData);
+    alert("Files uploaded successfully"); // Alert the user that the files were uploaded successfully
+    //loadSavedRoutes(); // After successful upload, reload the saved routes to include the new upload.
+    // I would also like to automatically change the dropdown to the default select a route option.
+    //dropdown.value = '';
+    window.location.reload();
 }); 
 
 async function loadSavedRoutes() {
+    console.log("loadSavedRoutes called");
     const res = await fetch("http://localhost:3000/routes");
     const routes = await res.json();
 
-    // loop through routes
+//     // first need to clear dropdown options except for "select a route" and "file upload"
+// // remove all options except the first two
+//     while (dropdown.options.length > 2) {
+//         dropdown.remove(2);
+//     }
     for (const route of routes) {
-        const option = document.createElement('option');
-        option.value = route.route_id; 
-        option.textContent = route.name;
-        dropdown.appendChild(option);
-    }
+          const option = document.createElement('option');
+          option.value = route.route_id; 
+          option.textContent = route.name;
+          dropdown.appendChild(option);
+        }
 }
 
 const dropdown = document.getElementById('route');
@@ -193,7 +194,7 @@ dropdown.addEventListener('change', async function () {
     const selectedValue = dropdown.value;
     if (!selectedValue) return;
 
-    let  tracks, trackPoints;
+
     // if the selected value is not file upload, then fetch the route data from the server and load the route.
     // if the selected value is file upload, then show the file upload interface and wait for the user to upload files. 
     if(selectedValue !== 'file_upload'){
@@ -225,13 +226,20 @@ deleteButton.addEventListener('click', async function() {
         alert("Cannot delete 'File Upload' option. Please select a saved route to delete.");
         return;
     } else if(confirm("Are you sure you want to delete this route? This action cannot be undone.")) {
-        deleteRoute(selectedValue);
+        await deleteRoute(selectedValue);
+        //loadSavedRoutes(); // Refresh the dropdown after deletion
+        //dropdown.value = '';
+        console.log("waiting");
+        window.location.reload();
     }
     
 });
 
 async function deleteRoute(routeId) {
-    await fetch(`http://localhost:3000/routes/${routeId}`, { method: "DELETE" });
+    const res = await fetch(`http://localhost:3000/routes/${routeId}`, { method: "DELETE" });
+    if(!res.ok) {
+        throw new Error("Failed to delete route");
+    }
 }
 
 
