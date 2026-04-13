@@ -1,8 +1,7 @@
 import fs from 'fs/promises';
 import { DOMParser } from '@xmldom/xmldom';
 import { gpx } from '@tmcw/togeojson';
-import { type } from 'os';
-import { time } from 'console';
+
 
 // Read the GPX file
 

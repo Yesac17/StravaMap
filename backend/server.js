@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import AWS from "aws-sdk";
+import { DOMParser } from '@xmldom/xmldom';
+import { gpx } from '@tmcw/togeojson';
 
 const app = express();
 app.use(cors());
@@ -100,52 +102,117 @@ app.delete("/routes/:id", async (req, res) => { // This endpoint will delete a r
 });
 
 
-// alright, my first step in switching to dynamodb is to fix the upload
 app.post("/upload", upload.array("files"), async (req, res) => {
     try {
-        let trackKey = null;
-        let pointKey = null;
         let routeName = "Uploaded Route";
 
         for (const file of req.files) {
-            const key = `routes/${Date.now()}-${file.originalname}`;
+            // I should insert my file conversion logic here.
+            const gpxFile = file.buffer.toString();
+            const dom = new DOMParser().parseFromString(gpxFile, "application/xml");
+            const geojson = gpx(dom);
+            const feature = geojson.features[0];
+
+            const tracksGeojson = {
+                type: 'FeatureCollection',
+                name: 'tracks',
+                features: [
+                    {
+                    type: 'Feature',
+                    properties: {
+                        name: feature.properties.name,
+                        type: feature.properties.type,
+                    },
+                    geometry: 
+                    {
+                        type: 'LineString',
+                        coordinates: feature.geometry.coordinates.map((coord) => [coord[0], coord[1]])
+                    } // this line is removing the ele from the coordinates
+                    }
+                ]
+            }
+
+            const coords = feature.geometry.coordinates;
+            const coordProps = feature.properties.coordinateProperties;
+            const features = [];    
+
+            for (let i = 0; i < coords.length; i++) {
+                const [lon, lat, ele] = coords[i];
+                const times = coordProps.times[i];
+                const atemp = coordProps.atemps[i];
+                const hr = coordProps.heart[i];
+                const cad = coordProps.cads[i];
+
+                const pointFeature = {
+                    type: "Feature",
+                    properties: {
+                        track_fid: 0,
+                        track_seg_id: 0,
+                        track_seg_point_id: i,
+                        ele: ele,
+                        time: times,
+                        gpxtpx_TrackPointExtension: `<gpxtpx:atemp>${atemp}</gpxtpx:atemp><gpxtpx:hr>${hr}</gpxtpx:hr><gpxtpx:cad>${cad}</gpxtpx:cad>`
+                        },
+                    geometry: {
+                        type: "Point",
+                        coordinates: [lon, lat]
+                    }
+                    }
+                features.push(pointFeature);
+            }
+
+            const trackPointsGeojson = {
+                type: "FeatureCollection",
+                name: "track_points",
+                features: features
+            }
+
+            // const key = `routes/${Date.now()}-${file.originalname}`;
+            // I need to replace this key with tracks.geojson key and track_points.geojson key.
+            const trackKey = `routes/${Date.now()}-tracks.geojson`;
+            const pointKey = `routes/${Date.now()}-track_points.geojson`;
 
             await s3.upload({
                 Bucket: "cdb-interactivemap",
-                Key: key,
-                Body: file.buffer,
+                Key: trackKey,
+                Body: JSON.stringify(tracksGeojson),
                 ContentType: file.mimetype,
             }).promise();
 
-            if (file.originalname === "tracks.geojson") {
-                trackKey = key;
-                const json = JSON.parse(file.buffer.toString());
-                if (json.features && json.features.length > 0) {
-                    routeName = json.features[0].properties.name || routeName;
-                }
-            } else if (file.originalname === "track_points.geojson") {
-                pointKey = key;
+            // now i need a second upload for the track_points.geojson file.
+            await s3.upload({
+                Bucket: "cdb-interactivemap",
+                Key: pointKey,
+                Body: JSON.stringify(trackPointsGeojson),
+                ContentType: file.mimetype,
+            }).promise();
+
+            // Getting activity name, if none, then use default route name.
+            // do i need the buffer? 
+            const json = JSON.parse(JSON.stringify(tracksGeojson));
+            if (json.features && json.features.length > 0) {
+                routeName = json.features[0].properties.name || routeName;
             }
+
+            const newRoute = { // Creating a new route object to be stored in DynamoDB.
+                route_id: Date.now().toString(),
+                name: routeName,
+                trackKey: trackKey,
+                pointKey: pointKey,
+                uploadedAt: new Date().toISOString()
+            };
+
+            await dynamoDb.put({ // Uploading newRoute object to DynamoDB.
+                TableName: TABLE_NAME,
+                Item: newRoute
+            }).promise();
+            res.json({ message: "Files uploaded successfully", route: newRoute });
         }
-
-        const newRoute = { // Creating a new route object to be stored in DynamoDB.
-            route_id: Date.now().toString(),
-            name: routeName,
-            trackKey: trackKey,
-            pointKey: pointKey,
-            uploadedAt: new Date().toISOString()
-        };
-
-        await dynamoDb.put({ // Uploading newRoute object to DynamoDB.
-            TableName: TABLE_NAME,
-            Item: newRoute
-        }).promise();
-        res.json({ message: "Files uploaded successfully", route: newRoute });
     } catch (error) {
         console.error("Error uploading files:", error);
         res.status(500).json({ error: "Failed to upload files" });
     }
-});
+}); //updated to include gpx -> geojson file conversion.
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");

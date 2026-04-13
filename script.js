@@ -92,15 +92,15 @@ const markerGroup = L.layerGroup().addTo(map);
     let currentHandlers = {elevation: null, pace: null, hr: null, cad: null};
 
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
-const fileInp = document.getElementById('folderInput');
+const fileInp = document.getElementById('fileInput');
 let fileList = [];
 let trackDataUpload = null;
 let pointDataUpload = null;
-fileInp.addEventListener('change', async function(event) {
+fileInp.addEventListener('change', async function(event) { // there is an error 
     // this function handles fileinput. 
-    fileList = event.target.files; // FileList object
-    if(fileList.length < 2){ // Check if both required files are uploaded
-            alert("Please upload two files: tracks.geojson and track_points.geojson");
+    fileList = event.target.files; // Get the FileList from the input event
+    if(fileList.length !== 1 || !fileList[0].name.endsWith('.gpx')){ // Check for exactly one gpx file.
+            alert("Please upload a single gpx file.");
             return;
         }
     const formData = new FormData();
@@ -114,9 +114,6 @@ fileInp.addEventListener('change', async function(event) {
         body: formData
     });
     alert("Files uploaded successfully"); // Alert the user that the files were uploaded successfully
-    //loadSavedRoutes(); // After successful upload, reload the saved routes to include the new upload.
-    // I would also like to automatically change the dropdown to the default select a route option.
-    //dropdown.value = '';
     window.location.reload();
 }); 
 
