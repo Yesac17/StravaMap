@@ -6,13 +6,12 @@ Overall, this project has been a great opportunity to build a full-stack applica
 Current tech stack: (useful to bring up in interviews to show what technologies I have experience with and what I have learned through this project)
 - Frontend: HTML/CSS/JavaScript with Leaflet for maps and Chart.js for charts.
 - Backend: Node.js with Express for handling API requests and file uploads.
-- File Storage: AWS S3 for storing uploaded route files.
-- metadeta: stored in json file (temporarily)
+- AWS S3 for storing uploaded route files.
+- DynamoDB for storing metadata about uploaded routes.
 
 
 Future additions:
 - AWS Lambda for serverless backend logic.
-- DynamoDB for storing metadata about uploaded routes.
 - AWS Cognito for user accounts and authentication.
 - A way to convert gpx files to the required two geojson files (could be lambda)
 - Integration with Garmin/Strava APIs for importing activities directly from user accounts.
