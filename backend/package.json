@@ -19,6 +19,8 @@
   "homepage": "https://github.com/Yesac17/StravaMap#readme",
   "description": "",
   "dependencies": {
+    "@tmcw/togeojson": "^7.1.2",
+    "@xmldom/xmldom": "^0.8.12",
     "aws-sdk": "^2.1693.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
