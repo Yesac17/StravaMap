@@ -96,11 +96,11 @@ const fileInp = document.getElementById('fileInput');
 let fileList = [];
 let trackDataUpload = null;
 let pointDataUpload = null;
-fileInp.addEventListener('change', async function(event) { // there is an error 
+fileInp.addEventListener('change', async function(event) {  
     // this function handles fileinput. 
     fileList = event.target.files; // Get the FileList from the input event
-    if(fileList.length !== 1 || !fileList[0].name.endsWith('.gpx')){ // Check for exactly one gpx file.
-            alert("Please upload a single gpx file.");
+    if(!fileList[0].name.endsWith('.gpx')){
+            alert("Please upload gpx file(s).");
             return;
         }
     const formData = new FormData();
@@ -109,7 +109,12 @@ fileInp.addEventListener('change', async function(event) { // there is an error
         formData.append("files", file);
     }
 
-    const res = await fetch("http://localhost:3000/upload", { // Send the FormData to the server using fetch API
+    console.log(fileList.length);
+    for (let file of fileList) {
+        console.log(file.name);
+    }
+
+    await fetch("http://localhost:3000/upload", { // Send the FormData to the server using fetch API
         method: "POST",
         body: formData
     });

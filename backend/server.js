@@ -46,10 +46,6 @@ app.get("/routes/:id", async (req, res) => { // I need to change this
         }
     }).promise();
     const route = result.Item; // The route object is stored in the Item property of the result.
-    console.log(route);
-    console.log(req.params.id);
-     // Logging the route object to the console for debugging purposes.
-    // Interesting that it is logging "undefined". 
     if (route) {
         const trackUrl = s3.getSignedUrl("getObject", {
             Bucket: "cdb-interactivemap",
@@ -77,8 +73,6 @@ app.delete("/routes/:id", async (req, res) => { // This endpoint will delete a r
     const routes = await getRoutes();
     const route = routes.findIndex(r => r.route_id === req.params.id);
     if (route !== -1) { // if the route is found, delete it from the array and save the updated array back to the file.
-        console.log(`Deleting route with id: ${req.params.id}`);
-
         await s3.deleteObject({
             Bucket: "cdb-interactivemap",
             Key: routes[route].trackKey
@@ -104,10 +98,11 @@ app.delete("/routes/:id", async (req, res) => { // This endpoint will delete a r
 
 app.post("/upload", upload.array("files"), async (req, res) => {
     try {
-        let routeName = "Uploaded Route";
-
-        for (const file of req.files) {
-            // I should insert my file conversion logic here.
+        console.log(req.files.length);
+        req.files.forEach(file => console.log(file.originalname));
+        const uploadedRoutes = [];
+        for (const file of req.files) { 
+            let routeName = "Uploaded Route";
             const gpxFile = file.buffer.toString();
             const dom = new DOMParser().parseFromString(gpxFile, "application/xml");
             const geojson = gpx(dom);
@@ -167,31 +162,26 @@ app.post("/upload", upload.array("files"), async (req, res) => {
                 features: features
             }
 
-            // const key = `routes/${Date.now()}-${file.originalname}`;
-            // I need to replace this key with tracks.geojson key and track_points.geojson key.
-            const trackKey = `routes/${Date.now()}-tracks.geojson`;
-            const pointKey = `routes/${Date.now()}-track_points.geojson`;
+            const base = `${Date.now()}-${file.originalname}`;
+            const trackKey = `routes/${base}-tracks.geojson`;
+            const pointKey = `routes/${base}-track_points.geojson`; 
 
             await s3.upload({
                 Bucket: "cdb-interactivemap",
                 Key: trackKey,
                 Body: JSON.stringify(tracksGeojson),
-                ContentType: file.mimetype,
+                ContentType: "application/geo+json",
             }).promise();
 
-            // now i need a second upload for the track_points.geojson file.
             await s3.upload({
                 Bucket: "cdb-interactivemap",
                 Key: pointKey,
                 Body: JSON.stringify(trackPointsGeojson),
-                ContentType: file.mimetype,
+                ContentType: "application/geo+json",
             }).promise();
 
-            // Getting activity name, if none, then use default route name.
-            // do i need the buffer? 
-            const json = JSON.parse(JSON.stringify(tracksGeojson));
-            if (json.features && json.features.length > 0) {
-                routeName = json.features[0].properties.name || routeName;
+            if (tracksGeojson.features && tracksGeojson.features.length > 0) {
+                routeName = tracksGeojson.features[0].properties.name || routeName;
             }
 
             const newRoute = { // Creating a new route object to be stored in DynamoDB.
@@ -206,8 +196,11 @@ app.post("/upload", upload.array("files"), async (req, res) => {
                 TableName: TABLE_NAME,
                 Item: newRoute
             }).promise();
-            res.json({ message: "Files uploaded successfully", route: newRoute });
+            console.log("uploaded a files.");
+            uploadedRoutes.push(newRoute);
         }
+        res.json({ message: "Files uploaded successfully", uploadedRoutes});
+
     } catch (error) {
         console.error("Error uploading files:", error);
         res.status(500).json({ error: "Failed to upload files" });
