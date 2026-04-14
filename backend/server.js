@@ -4,6 +4,7 @@ import multer from "multer";
 import AWS from "aws-sdk";
 import { DOMParser } from '@xmldom/xmldom';
 import { gpx } from '@tmcw/togeojson';
+import crypto from "crypto";
 
 const app = express();
 app.use(cors());
@@ -101,8 +102,30 @@ app.post("/upload", upload.array("files"), async (req, res) => {
         console.log(req.files.length);
         req.files.forEach(file => console.log(file.originalname));
         const uploadedRoutes = [];
+        const skippedDuplicates = [];
         for (const file of req.files) { 
             let routeName = "Uploaded Route";
+
+            // before any of the file converting or uploading, I need to check for duplicates in the system
+            const fileHash = crypto // creating hash of the uploaded gpx file, a "finger print" unique identifier
+                .createHash("sha256")
+                .update(file.buffer)
+                .digest("hex");
+            
+            const result = await dynamoDb.scan({
+                TableName: TABLE_NAME
+            }).promise();
+
+            const duplicate = result.Items.find(route => route.fileHash === fileHash);
+
+            if(duplicate) { //if the file is a duplicate, don't upload it
+                skippedDuplicates.push({
+                    fileName: file.originalname,
+                    reason: "Duplicate file upload"
+                });
+                continue;
+            }
+
             const gpxFile = file.buffer.toString();
             const dom = new DOMParser().parseFromString(gpxFile, "application/xml");
             const geojson = gpx(dom);
@@ -162,9 +185,11 @@ app.post("/upload", upload.array("files"), async (req, res) => {
                 features: features
             }
 
-            const base = `${Date.now()}-${file.originalname}`;
-            const trackKey = `routes/${base}-tracks.geojson`;
-            const pointKey = `routes/${base}-track_points.geojson`; 
+            const routeId = crypto.randomUUID();
+            const name = file.originalname.replace(".gpx", "").toLowerCase().replace(/\s+/g, "-");
+            const trackKey = `routes/${routeId}/${name}-tracks.geojson`;
+            const pointKey = `routes/${routeId}/${name}-track_points.geojson`; 
+
 
             await s3.upload({
                 Bucket: "cdb-interactivemap",
@@ -184,12 +209,14 @@ app.post("/upload", upload.array("files"), async (req, res) => {
                 routeName = tracksGeojson.features[0].properties.name || routeName;
             }
 
+
             const newRoute = { // Creating a new route object to be stored in DynamoDB.
-                route_id: Date.now().toString(),
+                route_id: routeId,
                 name: routeName,
                 trackKey: trackKey,
                 pointKey: pointKey,
-                uploadedAt: new Date().toISOString()
+                uploadedAt: new Date().toISOString(),
+                fileHash: fileHash
             };
 
             await dynamoDb.put({ // Uploading newRoute object to DynamoDB.
@@ -199,7 +226,8 @@ app.post("/upload", upload.array("files"), async (req, res) => {
             console.log("uploaded a files.");
             uploadedRoutes.push(newRoute);
         }
-        res.json({ message: "Files uploaded successfully", uploadedRoutes});
+        res.json({ message: "Files uploaded successfully", uploadedRoutes, skippedDuplicates});
+        console.log(JSON.stringify({uploadedRoutes, skippedDuplicates}));
 
     } catch (error) {
         console.error("Error uploading files:", error);
