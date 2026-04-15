@@ -114,11 +114,19 @@ fileInp.addEventListener('change', async function(event) {
         console.log(file.name);
     }
 
-    await fetch("http://localhost:3000/upload", { // Send the FormData to the server using fetch API
+    const res = await fetch("http://localhost:3000/upload", { // Send the FormData to the server using fetch API
         method: "POST",
         body: formData
     });
-    alert("Files uploaded successfully"); // Alert the user that the files were uploaded successfully
+
+    const data = await res.json();
+
+    const uploadedCount = data.uploadedRoutes?.length|| 0;
+    const skippedCount = data.skippedDuplicates?.length || 0;
+
+    console.log(uploadedCount, skippedCount);
+
+    alert("Succesfully uploaded " + uploadedCount + " activities and skipped " + skippedCount + " duplicates."); // Alert the user that the files were uploaded successfully
     window.location.reload();
 }); 
 
@@ -127,11 +135,6 @@ async function loadSavedRoutes() {
     const res = await fetch("http://localhost:3000/routes");
     const routes = await res.json();
 
-//     // first need to clear dropdown options except for "select a route" and "file upload"
-// // remove all options except the first two
-//     while (dropdown.options.length > 2) {
-//         dropdown.remove(2);
-//     }
     for (const route of routes) {
           const option = document.createElement('option');
           option.value = route.route_id; 

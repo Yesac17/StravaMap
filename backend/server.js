@@ -112,13 +112,16 @@ app.post("/upload", upload.array("files"), async (req, res) => {
                 .update(file.buffer)
                 .digest("hex");
             
-            const result = await dynamoDb.scan({
-                TableName: TABLE_NAME
+            const duplicateResult = await dynamoDb.query({
+                TableName: TABLE_NAME,
+                IndexName: "fileHash-index",
+                KeyConditionExpression: "fileHash = :fileHash",
+                ExpressionAttributeValues: {
+                    ":fileHash": fileHash
+                }
             }).promise();
 
-            const duplicate = result.Items.find(route => route.fileHash === fileHash);
-
-            if(duplicate) { //if the file is a duplicate, don't upload it
+            if(duplicateResult.Items && duplicateResult.Items.length > 0) { //if the file is a duplicate, don't upload it
                 skippedDuplicates.push({
                     fileName: file.originalname,
                     reason: "Duplicate file upload"
