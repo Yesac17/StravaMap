@@ -132,7 +132,7 @@ fileInp.addEventListener('change', async function(event) {
 
 async function loadSavedRoutes() {
     console.log("loadSavedRoutes called");
-    const res = await fetch("http://localhost:3000/routes");
+    const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes");
     const routes = await res.json();
 
     for (const route of routes) {
