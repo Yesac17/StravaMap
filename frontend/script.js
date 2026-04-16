@@ -207,7 +207,7 @@ dropdown.addEventListener('change', async function () {
     // if the selected value is not file upload, then fetch the route data from the server and load the route.
     // if the selected value is file upload, then show the file upload interface and wait for the user to upload files. 
     if(selectedValue !== 'file_upload'){
-            const res = await fetch(`https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes${selectedValue}`);
+            const res = await fetch(`https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes/${selectedValue}`);
             
             const route = await res.json();
 
