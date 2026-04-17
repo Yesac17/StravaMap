@@ -245,7 +245,7 @@ deleteButton.addEventListener('click', async function() {
 });
 
 async function deleteRoute(routeId) {
-    const res = await fetch(`http://localhost:3000/routes/${routeId}`, { method: "DELETE" });
+    const res = await fetch(`https://4aliv9sulf.execute-api.us-east-2.amazonaws.com/${routeId}`, { method: "DELETE" });
     if(!res.ok) {
         throw new Error("Failed to delete route");
     }
