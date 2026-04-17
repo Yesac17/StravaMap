@@ -114,7 +114,7 @@ fileInp.addEventListener('change', async function(event) {
         console.log(file.name);
     }
 
-    const res = await fetch("http://localhost:3000/upload", { // Send the FormData to the server using fetch API
+    const res = await fetch("https://c39pvq89xc.execute-api.us-east-2.amazonaws.com/upload", { // Send the FormData to the server using fetch API
         method: "POST",
         body: formData
     });
