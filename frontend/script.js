@@ -123,6 +123,7 @@ fileInp.addEventListener('change', async function(event) {
     });
 
     const { uploadUrl, key } = await res.json();
+    if (!res.ok) throw new Error("Failed to create upload URL");
     console.log("Presigned Key: ", key);
 
     const uploadRes = await fetch(uploadUrl, {
