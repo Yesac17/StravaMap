@@ -109,10 +109,10 @@ fileInp.addEventListener('change', async function(event) {
     //     formData.append("files", file);
     // }
 
-    console.log(fileList.length);
-    for (let file of fileList) {
-        console.log(file.name);
-    }
+    // console.log(fileList.length);
+    // for (let file of fileList) {
+    //     console.log(file.name);
+    // }
     try{
     const res = await fetch("https://lai886clh5.execute-api.us-east-2.amazonaws.com/uploadURL", { // Send the FormData to the server using fetch API
         method: "POST",
@@ -125,10 +125,10 @@ fileInp.addEventListener('change', async function(event) {
     const { uploadUrl, key } = await res.json();
     console.log("Presigned Key: ", key);
 
-    const uploadRes = await fetch(uploadURL, {
+    const uploadRes = await fetch(uploadUrl, {
         method: "PUT",
         headers: {
-            "Content-Type": file.type || "application/gpx+xml"
+            "Content-Type": fileList[0].type || "application/gpx+xml"
         },
         body: fileList[0]
     })
@@ -148,7 +148,7 @@ fileInp.addEventListener('change', async function(event) {
 
     //console.log(uploadedCount, skippedCount);
 
-    alert("Succesfully uploaded " + uploadedCount + " activities and skipped " + skippedCount + " duplicates."); // Alert the user that the files were uploaded successfully
+    //alert("Succesfully uploaded " + uploadedCount + " activities and skipped " + skippedCount + " duplicates."); // Alert the user that the files were uploaded successfully
     window.location.reload();
 }); 
 
