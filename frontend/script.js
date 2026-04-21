@@ -150,7 +150,7 @@ fileInp.addEventListener('change', async function(event) {
     //console.log(uploadedCount, skippedCount);
 
     //alert("Succesfully uploaded " + uploadedCount + " activities and skipped " + skippedCount + " duplicates."); // Alert the user that the files were uploaded successfully
-    window.location.reload();
+    //window.location.reload();
 }); 
 
 async function loadSavedRoutes() {
