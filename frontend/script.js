@@ -99,32 +99,54 @@ let pointDataUpload = null;
 fileInp.addEventListener('change', async function(event) {  
     // this function handles fileinput. 
     fileList = event.target.files; // Get the FileList from the input event
-    if(!fileList[0].name.endsWith('.gpx')){
+    if (!fileList.length || !fileList[0].name.toLowerCase().endsWith('.gpx')){
             alert("Please upload gpx file(s).");
             return;
         }
-    const formData = new FormData();
+    // const formData = new FormData();
 
-    for (let file of fileList) { // Loop through the FileList and append each file to the FormData object
-        formData.append("files", file);
-    }
+    // for (let file of fileList) { // Loop through the FileList and append each file to the FormData object
+    //     formData.append("files", file);
+    // }
 
     console.log(fileList.length);
     for (let file of fileList) {
         console.log(file.name);
     }
-
-    const res = await fetch("https://c39pvq89xc.execute-api.us-east-2.amazonaws.com/upload", { // Send the FormData to the server using fetch API
+    try{
+    const res = await fetch("https://lai886clh5.execute-api.us-east-2.amazonaws.com/uploadURL", { // Send the FormData to the server using fetch API
         method: "POST",
-        body: formData
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ fileName: fileList[0].name })
     });
 
-    const data = await res.json();
+    const { uploadUrl, key } = await res.json();
+    console.log("Presigned Key: ", key);
 
-    const uploadedCount = data.uploadedRoutes?.length|| 0;
-    const skippedCount = data.skippedDuplicates?.length || 0;
+    const uploadRes = await fetch(uploadURL, {
+        method: "PUT",
+        headers: {
+            "Content-Type": file.type || "application/gpx+xml"
+        },
+        body: fileList[0]
+    })
 
-    console.log(uploadedCount, skippedCount);
+    if(!uploadRes.ok) throw new Error("Failed to upload file");
+
+    alert("GPX succesfully uploaded.");
+    console.log("Uploaded GPX Key: ", key);
+    }
+    catch (err) {
+        console.error("Error uploading file: ", err);
+        alert("Failed upload.");
+    }
+
+    // const uploadedCount = data.uploadedRoutes?.length|| 0;
+    // const skippedCount = data.skippedDuplicates?.length || 0;
+
+    //console.log(uploadedCount, skippedCount);
 
     alert("Succesfully uploaded " + uploadedCount + " activities and skipped " + skippedCount + " duplicates."); // Alert the user that the files were uploaded successfully
     window.location.reload();
