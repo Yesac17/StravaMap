@@ -129,7 +129,7 @@ fileInp.addEventListener('change', async function(event) {
     const uploadRes = await fetch(uploadUrl, {
         method: "PUT",
         headers: {
-            "Content-Type": fileList[0].type || "application/gpx+xml"
+            "Content-Type": "application/gpx+xml"
         },
         body: fileList[0]
     })
