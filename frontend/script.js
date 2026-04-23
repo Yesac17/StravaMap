@@ -151,6 +151,8 @@ fileInp.addEventListener('change', async function(event) {
 
     //alert("Succesfully uploaded " + uploadedCount + " activities and skipped " + skippedCount + " duplicates."); // Alert the user that the files were uploaded successfully
     finally{
+        console.log("FINALLY RAN");
+        alert("finally ran");
         window.location.reload();    
     }
 }); 
