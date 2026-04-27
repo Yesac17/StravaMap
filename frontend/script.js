@@ -102,9 +102,24 @@ function setUploadStatus(message) {
     uploadStatus.textContent = message;
 }
 
-function routeExists(routes, name) {
-    return routes.some(r => r.name === name);
+async function waitForRoute(routeName) {
+    const maxAttempts = 15;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        setUploadStatus(`Processing route... ${attempt}/${maxAttempts}`);
+        
+        const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes");
+        const routes = await res.json();
+
+
+        if(routes.some(r => r.name === routeName)){
+            return true;
+        }
+        await new Promise(r => setTimeout(r, 1000));            
+    }
+
+    return false;
 }
+
 
 fileInp.addEventListener('change', async function(event) {  
     // this function handles fileinput. 
@@ -113,16 +128,6 @@ fileInp.addEventListener('change', async function(event) {
             alert("Please upload gpx file(s).");
             return;
         }
-    // const formData = new FormData();
-
-    // for (let file of fileList) { // Loop through the FileList and append each file to the FormData object
-    //     formData.append("files", file);
-    // }
-
-    // console.log(fileList.length);
-    // for (let file of fileList) {
-    //     console.log(file.name);
-    // }
     let uploadSucceeded = false;
 
     try{
@@ -154,6 +159,20 @@ fileInp.addEventListener('change', async function(event) {
         if(!uploadRes.ok) throw new Error("Failed to upload file");
 
         setUploadStatus("Upload complete. Processing route...");
+
+        const routeName = file.name
+            .replace(/\.gpx$/i, "")
+            .replace(/_/g, " ");
+
+        const ready = await waitForRoute(routeName);
+
+        if (ready) {
+            setUploadStatus("Route ready. Refreshing...");
+            window.location.reload();
+        } else {
+            setUploadStatus("Route is still processing. Try refreshing in a moment.");
+        }
+
         uploadSucceeded = true;
     } catch (err) {
         console.error("Error uploading file: ", err);
@@ -161,13 +180,6 @@ fileInp.addEventListener('change', async function(event) {
         alert("Failed upload.");
     }finally{
         fileInp.disabled = false;
-        if (uploadSucceeded) {
-            const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes");
-            const routes = await res.json();
-            const exists = routeExists(routes, "Tour de Minneapolis");
-            console.log(exists);
-            setTimeout(() => { window.location.reload(); }, 5000);
-        }   
     }
 }); 
 
