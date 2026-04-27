@@ -142,17 +142,9 @@ fileInp.addEventListener('change', async function(event) {
     catch (err) {
         console.error("Error uploading file: ", err);
         alert("Failed upload.");
-    }
-
-    // const uploadedCount = data.uploadedRoutes?.length|| 0;
-    // const skippedCount = data.skippedDuplicates?.length || 0;
-
-    //console.log(uploadedCount, skippedCount);
-
-    //alert("Succesfully uploaded " + uploadedCount + " activities and skipped " + skippedCount + " duplicates."); // Alert the user that the files were uploaded successfully
-    finally{
-        console.log("FINALLY RAN");
-        alert("finally ran");
+    }finally{
+        //console.log("FINALLY RAN");
+        //alert("finally ran");
         window.location.reload();    
     }
 }); 
