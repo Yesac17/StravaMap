@@ -93,9 +93,15 @@ const markerGroup = L.layerGroup().addTo(map);
 
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
 const fileInp = document.getElementById('fileInput');
+const uploadStatus = document.getElementById('uploadStatus');
 let fileList = [];
 let trackDataUpload = null;
 let pointDataUpload = null;
+
+function setUploadStatus(message) {
+    uploadStatus.textContent = message;
+}
+
 fileInp.addEventListener('change', async function(event) {  
     // this function handles fileinput. 
     fileList = event.target.files; // Get the FileList from the input event
@@ -116,36 +122,41 @@ fileInp.addEventListener('change', async function(event) {
     let uploadSucceeded = false;
 
     try{
-    const res = await fetch("https://lai886clh5.execute-api.us-east-2.amazonaws.com/uploadURL", { // Send the FormData to the server using fetch API
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ fileName: fileList[0].name })
-    });
+        fileInp.disabled = true;
+        setUploadStatus("Requesting upload permission...");
+        const res = await fetch("https://lai886clh5.execute-api.us-east-2.amazonaws.com/uploadURL", { // Send the FormData to the server using fetch API
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ fileName: fileList[0].name })
+        });
 
-    const { uploadUrl, key } = await res.json();
-    if (!res.ok) throw new Error("Failed to create upload URL");
-    console.log("Presigned Key: ", key);
+        if (!res.ok) throw new Error("Failed to create upload URL");
 
-    const uploadRes = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/gpx+xml"
-        },
-        body: fileList[0]
-    })
+        const { uploadUrl, key } = await res.json();
+        console.log("Presigned Key: ", key);
 
-    if(!uploadRes.ok) throw new Error("Failed to upload file");
+        setUploadStatus("Uploading GPX to S3...");
 
-    alert("GPX succesfully uploaded.");
-    console.log("Uploaded GPX Key: ", key);
-    uploadSucceeded = true;
-    }
-    catch (err) {
+        const uploadRes = await fetch(uploadUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/gpx+xml"
+            },
+            body: fileList[0]
+        })
+
+        if(!uploadRes.ok) throw new Error("Failed to upload file");
+
+        setUploadStatus("Upload complete. Processing route...");
+        uploadSucceeded = true;
+    } catch (err) {
         console.error("Error uploading file: ", err);
+        setUploadStatus("Upload failed! Please try again.");
         alert("Failed upload.");
     }finally{
+        fileInp.disabled = false;
         if (uploadSucceeded) {
             setTimeout(() => { window.location.reload(); }, 5000);
         }   
