@@ -102,6 +102,10 @@ function setUploadStatus(message) {
     uploadStatus.textContent = message;
 }
 
+function routeExists(routes, name) {
+    return routes.some(r => r.name === name);
+}
+
 fileInp.addEventListener('change', async function(event) {  
     // this function handles fileinput. 
     fileList = event.target.files; // Get the FileList from the input event
@@ -158,6 +162,8 @@ fileInp.addEventListener('change', async function(event) {
     }finally{
         fileInp.disabled = false;
         if (uploadSucceeded) {
+            const exists = routeExists(routes, "Tour de Minneapolis");
+            console.log(exists);
             setTimeout(() => { window.location.reload(); }, 5000);
         }   
     }
