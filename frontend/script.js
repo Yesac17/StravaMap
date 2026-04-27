@@ -113,6 +113,8 @@ fileInp.addEventListener('change', async function(event) {
     // for (let file of fileList) {
     //     console.log(file.name);
     // }
+    let uploadSucceeded = false;
+
     try{
     const res = await fetch("https://lai886clh5.execute-api.us-east-2.amazonaws.com/uploadURL", { // Send the FormData to the server using fetch API
         method: "POST",
@@ -143,9 +145,9 @@ fileInp.addEventListener('change', async function(event) {
         console.error("Error uploading file: ", err);
         alert("Failed upload.");
     }finally{
-        //console.log("FINALLY RAN");
-        //alert("finally ran");
-        window.location.reload();    
+        if (uploadSucceeded) {
+            setTimeout(() => { window.location.reload(); }, 5000);
+        }   
     }
 }); 
 
