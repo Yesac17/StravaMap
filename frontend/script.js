@@ -170,7 +170,7 @@ fileInp.addEventListener('change', async function(event) {
             setUploadStatus("Route ready. Refreshing...");
             window.location.reload();
         } else {
-            setUploadStatus("Route is still processing. Try refreshing in a moment.");
+            setUploadStatus("Route already exists or still processing.");
         }
 
         uploadSucceeded = true;
