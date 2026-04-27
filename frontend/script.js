@@ -162,6 +162,8 @@ fileInp.addEventListener('change', async function(event) {
     }finally{
         fileInp.disabled = false;
         if (uploadSucceeded) {
+            const res = await fetch("YOUR_ROUTES_ENDPOINT");
+            const routes = await res.json();
             const exists = routeExists(routes, "Tour de Minneapolis");
             console.log(exists);
             setTimeout(() => { window.location.reload(); }, 5000);
