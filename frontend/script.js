@@ -160,7 +160,7 @@ fileInp.addEventListener('change', async function(event) {
 
         setUploadStatus("Upload complete. Processing route...");
 
-        const routeName = file.name
+        const routeName = fileList[0].name
             .replace(/\.gpx$/i, "")
             .replace(/_/g, " ");
 
