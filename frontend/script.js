@@ -162,7 +162,7 @@ fileInp.addEventListener('change', async function(event) {
     }finally{
         fileInp.disabled = false;
         if (uploadSucceeded) {
-            const res = await fetch("YOUR_ROUTES_ENDPOINT");
+            const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes");
             const routes = await res.json();
             const exists = routeExists(routes, "Tour de Minneapolis");
             console.log(exists);
