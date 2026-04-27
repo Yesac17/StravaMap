@@ -140,6 +140,7 @@ fileInp.addEventListener('change', async function(event) {
 
     alert("GPX succesfully uploaded.");
     console.log("Uploaded GPX Key: ", key);
+    uploadSucceeded = true;
     }
     catch (err) {
         console.error("Error uploading file: ", err);
