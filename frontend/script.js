@@ -120,6 +120,14 @@ async function waitForRoute(routeId) {
     return false;
 }
 
+async function getFileHash(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+    return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
 
 fileInp.addEventListener('change', async function(event) {  
     // this function handles fileinput. 
@@ -131,18 +139,26 @@ fileInp.addEventListener('change', async function(event) {
     try{
         fileInp.disabled = true;
         setUploadStatus("Requesting upload permission...");
+        setUploadStatus("Checking for duplicates...");
+        const fileHash = await getFileHash(fileList[0]);
+        console.log("File Hash: ", fileHash);
         const res = await fetch("https://lai886clh5.execute-api.us-east-2.amazonaws.com/uploadURL", { // Send the FormData to the server using fetch API
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ fileName: fileList[0].name })
+            body: JSON.stringify({ fileName: fileList[0].name, fileHash: fileHash })
         });
 
         if (!res.ok) throw new Error("Failed to create upload URL");
 
-        const { uploadUrl, key, routeId } = await res.json();
+        const { duplicate, uploadUrl, key, routeId } = await res.json();
         console.log("Presigned Key: ", key);
+
+        if (duplicate) {
+            setUploadStatus("This route has already been uploaded.");
+            return;
+        }
 
         setUploadStatus("Uploading GPX to S3...");
 
@@ -169,7 +185,7 @@ fileInp.addEventListener('change', async function(event) {
             sessionStorage.setItem("newRouteId", routeId);
             window.location.reload();
         } else {
-            setUploadStatus("Route already exists or still processing.");
+            setUploadStatus("Still processing, try refreshing.");
         }
 
     } catch (err) {
