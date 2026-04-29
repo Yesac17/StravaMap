@@ -138,7 +138,6 @@ fileInp.addEventListener('change', async function(event) {
         }
     try{
         fileInp.disabled = true;
-        setUploadStatus("Requesting upload permission...");
         setUploadStatus("Checking for duplicates...");
         const fileHash = await getFileHash(fileList[0]);
         console.log("File Hash: ", fileHash);
@@ -149,6 +148,7 @@ fileInp.addEventListener('change', async function(event) {
             },
             body: JSON.stringify({ fileName: fileList[0].name, fileHash: fileHash })
         });
+        setUploadStatus("Requesting upload permission...");
 
         if (!res.ok) throw new Error("Failed to create upload URL");
 
@@ -786,8 +786,8 @@ function makeSyncHandlers(sourceChart, targetChart, coords) {
                     }
                 },
                 y: {
-                    min: 6,
-                    max: 10,
+                    min: 4,
+                    max: 11,
                     reverse: true,
                     title: {
                         display: true,
