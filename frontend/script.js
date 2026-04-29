@@ -102,7 +102,7 @@ function setUploadStatus(message) {
     uploadStatus.textContent = message;
 }
 
-async function waitForRoute(routeName) {
+async function waitForRoute(routeId) {
     const maxAttempts = 15;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         setUploadStatus(`Processing route... ${attempt}/${maxAttempts}`);
