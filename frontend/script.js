@@ -111,7 +111,7 @@ async function waitForRoute(routeName) {
         const routes = await res.json();
 
 
-        if(routes.some(r => r.name === routeName)){
+        if(routes.some(r => r.route_id === routeId)){
             return true;
         }
         await new Promise(r => setTimeout(r, 1000));            
@@ -143,7 +143,7 @@ fileInp.addEventListener('change', async function(event) {
 
         if (!res.ok) throw new Error("Failed to create upload URL");
 
-        const { uploadUrl, key } = await res.json();
+        const { uploadUrl, key, routeId } = await res.json();
         console.log("Presigned Key: ", key);
 
         setUploadStatus("Uploading GPX to S3...");
@@ -164,7 +164,7 @@ fileInp.addEventListener('change', async function(event) {
             .replace(/\.gpx$/i, "")
             .replace(/_/g, " ");
 
-        const ready = await waitForRoute(routeName);
+        const ready = await waitForRoute(routeId);
 
         if (ready) {
             setUploadStatus("Route ready. Refreshing...");
