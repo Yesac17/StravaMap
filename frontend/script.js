@@ -128,8 +128,6 @@ fileInp.addEventListener('change', async function(event) {
             alert("Please upload gpx file(s).");
             return;
         }
-    let uploadSucceeded = false;
-
     try{
         fileInp.disabled = true;
         setUploadStatus("Requesting upload permission...");
@@ -168,12 +166,12 @@ fileInp.addEventListener('change', async function(event) {
 
         if (ready) {
             setUploadStatus("Route ready. Refreshing...");
+            sessionStorage.setItem("newRouteId", routeId);
             window.location.reload();
         } else {
             setUploadStatus("Route already exists or still processing.");
         }
 
-        uploadSucceeded = true;
     } catch (err) {
         console.error("Error uploading file: ", err);
         setUploadStatus("Upload failed! Please try again.");
@@ -193,7 +191,15 @@ async function loadSavedRoutes() {
           option.value = route.route_id; 
           option.textContent = route.name;
           dropdown.appendChild(option);
-        }
+    }
+
+    const newRouteId = sessionStorage.getItem("newRouteId");
+
+    if (newRouteId) {
+        sessionStorage.removeItem("newRouteId");
+        dropdown.value = newRouteId;
+        dropdown.dispatchEvent(new Event("change"));
+    }
 }
 
 const dropdown = document.getElementById('route');
@@ -256,7 +262,6 @@ dropdown.addEventListener('change', async function () {
     map.center = [44.8765, -91.9207];
     map.zoom = 7;
 
-
     // if the selected value is not file upload, then fetch the route data from the server and load the route.
     // if the selected value is file upload, then show the file upload interface and wait for the user to upload files. 
     if(selectedValue !== 'file_upload'){
@@ -309,12 +314,6 @@ async function deleteRoute(routeId) {
 
 
 async function loadRoute(trackData, pointData) {
-// Did I do this right? I'm pretty sure i dont need this promise.all at all anymore since I used fetch and readFile in the event listener. The answer is 
-    // Promise.all([
-    //     fetch(tracks).then(res => res.json()),
-    //     fetch(trackPoints).then(res => res.json())
-    // ]).then(([trackData, pointData]) => {
-    // ------ Draw Route Polyline on Map ------
     const polyline = L.geoJSON(trackData, {
             style: { color: 'blue', weight: 4 }            
         }).addTo(routeGroup);
