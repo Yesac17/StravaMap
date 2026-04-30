@@ -46,6 +46,16 @@ const baseMaps = {
     "Google Terrain": googleTerrain
 };
 
+const playButton = L.control({ position: "bottomleft"});
+
+playButton.onAdd = function(map) {
+    const div = L.DomUtil.create('div', 'leaftlet-bar leaflet-control');
+
+    const button = L.DomUtil.create("button", "", div);
+    div.innerHTML = '<button id="playButton" style="width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #ccc; cursor: pointer;"><span>▶</span></button>'
+    return div;
+}
+
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
 // ==================== 2. HELPER FUNCTIONS ======================
