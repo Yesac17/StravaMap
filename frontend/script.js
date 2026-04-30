@@ -1017,4 +1017,4 @@ function makeSyncHandlers(sourceChart, targetChart, coords) {
 // 6. The code assumes that the uploaded files will always be in the correct format and contain the expected properties, which may not always be the case. Adding validation checks for the uploaded data would help prevent errors and improve user feedback.
 // 7. The code for calculating pace and smoothing it with a moving average is somewhat complex and may not be immediately clear to other developers. Adding comments or refactoring this logic into a separate function could improve readability.
 // 8. The code for handling mile markers and their visibility is functional but could potentially be improved by using a more efficient method for toggling visibility, such as using CSS classes or a dedicated layer group that can be easily shown or hidden without needing to add/remove individual markers from the map.
-
+// Im sure there are plenty more issues.
