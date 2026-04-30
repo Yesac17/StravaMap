@@ -346,6 +346,38 @@ async function loadRoute(trackData, pointData) {
             return { lat, lon, ele, time, hr, cad, temp };
     });
 
+    // Route Playback
+
+    let playbackIndex = 0;
+    let playbackTimer = null;
+
+    const playbackMarker = L.circleMarker([coords[0].lat, coords[0].lon], {
+        radius: 10, 
+        color: 'red',
+        fillColor: 'red',
+        fillOpacity: 1,
+    }).addTo(map);
+
+    function startPlayback() {
+        if (playbackTimer) clearInterval(playbackTimer);
+        
+        playbackIndex = 0;
+
+        playbackTimer = setInterval(() => {
+            if (playbackIndex >= coords.length) {
+                clearInterval(playbackTimer);
+                playbackTimer = null;
+                return;
+            }
+
+            const point = coords[playbackIndex];
+
+            playbackIndex.setLatLng([point.lat, point.lon]);
+
+            playbackIndex += 10; // skip points to make it move faster
+        });
+    }
+
     // Compute Cumulative Distance (in miles)
     let cumDist = 0;
     for (let i = 0; i < coords.length; i++) {
@@ -605,6 +637,7 @@ function makeSyncHandlers(sourceChart, targetChart, coords) {
     
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
+    document.getElementById("playRoute").onclick = startPlayback;
 
 
     // ==================== 5. BUILD CHARTS ====================
