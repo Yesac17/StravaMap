@@ -69,6 +69,8 @@ function createPlayButton(onClick){
     };
     return playButton;
 }
+let playControl = null;
+
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
 // ==================== 2. HELPER FUNCTIONS ======================
@@ -402,8 +404,6 @@ async function loadRoute(trackData, pointData) {
             playbackIndex += 10; // skip points to make it move faster
         }, 30);
     }
-
-    let playControl = null;
 
     function showPlayButton() {
         if (!playControl) {
