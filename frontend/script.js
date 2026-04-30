@@ -53,6 +53,11 @@ playButton.onAdd = function(map) {
 
     const button = L.DomUtil.create("button", "", div);
     div.innerHTML = '<button id="playButton" style="width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #ccc; cursor: pointer;"><span>▶</span></button>'
+    L.DomEvent.disableClickPropagation(button);
+    button.onclick = function () {
+        console.log("Button clicked");
+        startPlayback();
+    };
     return div;
 }
 playButton.addTo(map);
