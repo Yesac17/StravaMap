@@ -384,11 +384,19 @@ async function loadRoute(trackData, pointData) {
         fillOpacity: 1,
     }).addTo(map);
 
+    // creating playback trail
+    let playbackTrail = L.polyline([], {
+        color: "orange",
+        weight: 5
+    }).addTo(routeGroup);
+
     // 
     function startPlayback() {
         if (playbackTimer) clearInterval(playbackTimer);
         
         playbackIndex = 0;
+        playbackTrail.setLatLngs([]);
+        playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
 
         playbackTimer = setInterval(() => {
             if (playbackIndex >= coords.length) {
@@ -400,6 +408,12 @@ async function loadRoute(trackData, pointData) {
             const point = coords[playbackIndex];
 
             playbackMarker.setLatLng([point.lat, point.lon]);
+
+            const traveledCoords = coords
+                .slice(0, playbackIndex + 1)
+                .map(p => [p.lat, p.lon]);
+
+            playbackTrail.setLatLngs(traveledCoords);
 
             playbackIndex += 10; // skip points to make it move faster
         }, 30);
