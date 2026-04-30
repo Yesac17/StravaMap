@@ -351,6 +351,7 @@ async function loadRoute(trackData, pointData) {
     let playbackIndex = 0;
     let playbackTimer = null;
 
+    // creating playback circle
     const playbackMarker = L.circleMarker([coords[0].lat, coords[0].lon], {
         radius: 10, 
         color: 'red',
@@ -358,6 +359,7 @@ async function loadRoute(trackData, pointData) {
         fillOpacity: 1,
     }).addTo(map);
 
+    // 
     function startPlayback() {
         if (playbackTimer) clearInterval(playbackTimer);
         
@@ -372,10 +374,10 @@ async function loadRoute(trackData, pointData) {
 
             const point = coords[playbackIndex];
 
-            playbackIndex.setLatLng([point.lat, point.lon]);
+            playbackMarker.setLatLng([point.lat, point.lon]);
 
             playbackIndex += 10; // skip points to make it move faster
-        });
+        }, 30);
     }
 
     // Compute Cumulative Distance (in miles)
