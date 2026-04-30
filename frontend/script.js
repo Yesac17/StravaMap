@@ -353,7 +353,7 @@ async function loadRoute(trackData, pointData) {
 
     // creating playback circle
     const playbackMarker = L.circleMarker([coords[0].lat, coords[0].lon], {
-        radius: 10, 
+        radius: 5, 
         color: 'red',
         fillColor: 'red',
         fillOpacity: 1,
