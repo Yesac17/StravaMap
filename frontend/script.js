@@ -382,6 +382,7 @@ async function loadRoute(trackData, pointData) {
         color: 'green',
         fillColor: 'green',
         fillOpacity: 1,
+        opacity: 0
     }).addTo(map);
 
     // creating playback trail
@@ -398,6 +399,7 @@ async function loadRoute(trackData, pointData) {
         playbackTrail.setLatLngs([]);
         playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
         playbackTrail.bringToFront();
+        playbackMarker.setStyle({ opacity: 1 });
 
 
         playbackTimer = setInterval(() => {
