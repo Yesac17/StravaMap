@@ -45,22 +45,20 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
+function createPlayButton(onClick){
+    const playButton = L.control({ position: "bottomleft"});
 
-const playButton = L.control({ position: "bottomleft"});
+    playButton.onAdd = function() {
+        const div = L.DomUtil.create('div', 'leaftlet-bar leaflet-control');
 
-playButton.onAdd = function(map) {
-    const div = L.DomUtil.create('div', 'leaftlet-bar leaflet-control');
-
-    const button = L.DomUtil.create("button", "", div);
-    button.innerHTML = '<button id="playButton" style="width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #ccc; cursor: pointer;"><span>▶</span></button>'
-    L.DomEvent.disableClickPropagation(button);
-    button.onclick = function () {
-        console.log("Button clicked");
-        startPlayback();
+        const button = L.DomUtil.create("button", "", div);
+        button.innerHTML = '<button id="playButton" style="width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #ccc; cursor: pointer;"><span>▶</span></button>'
+        L.DomEvent.disableClickPropagation(button);
+        button.onclick = onClick;
+        return div;
     };
-    return div;
+    return playButton;
 }
-playButton.addTo(map);
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
 // ==================== 2. HELPER FUNCTIONS ======================
@@ -654,7 +652,8 @@ function makeSyncHandlers(sourceChart, targetChart, coords) {
     
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
-    document.getElementById("playRoute").onclick = startPlayback;
+    // document.getElementById("playRoute").onclick = startPlayback;
+    createPlayButton(startPlayback).addTo(map);
 
 
     // ==================== 5. BUILD CHARTS ====================
