@@ -49,12 +49,22 @@ function createPlayButton(onClick){
     const playButton = L.control({ position: "bottomleft"});
 
     playButton.onAdd = function() {
-        const div = L.DomUtil.create('div', 'leaftlet-bar leaflet-control');
+        const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 
         const button = L.DomUtil.create("button", "", div);
-        button.innerHTML = '<button id="playButton" style="width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #ccc; cursor: pointer;"><span>▶</span></button>'
+        button.innerHTML = "▶";
+
+        button.style.width = "50px";
+        button.style.height = "50px";
+        button.style.borderRadius = "50%";
+        button.style.backgroundColor = "white";
+        button.style.border = "2px solid #ccc";
+        button.style.cursor = "pointer";
+        button.style.fontSize = "18px";
+
         L.DomEvent.disableClickPropagation(button);
-        button.onclick = onClick;
+        L.DomEvent.on(button, "click", onClick);
+        
         return div;
     };
     return playButton;
