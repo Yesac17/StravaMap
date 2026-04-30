@@ -668,7 +668,7 @@ async function loadRoute(trackData, pointData) {
         }
     });
     // I would like the checkbox to default to true
-    
+    showPlayButton();
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
     // document.getElementById("playRoute").onclick = startPlayback;
