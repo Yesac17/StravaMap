@@ -331,7 +331,7 @@ async function deleteRoute(routeId) {
 
 async function loadRoute(trackData, pointData) {
     const polyline = L.geoJSON(trackData, {
-            style: { color: 'blue', weight: 4 }            
+            style: { color: 'black', weight: 4 }            
         }).addTo(routeGroup);
 
 
@@ -353,9 +353,9 @@ async function loadRoute(trackData, pointData) {
 
     // creating playback circle
     const playbackMarker = L.circleMarker([coords[0].lat, coords[0].lon], {
-        radius: 5, 
-        color: 'red',
-        fillColor: 'red',
+        radius: 5,
+        color: 'green',
+        fillColor: 'green',
         fillOpacity: 1,
     }).addTo(map);
 
