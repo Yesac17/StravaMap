@@ -405,12 +405,12 @@ async function loadRoute(trackData, pointData) {
         }, 30);
     }
 
-    function showPlayButton() {
-        if (!playControl) {
-            playControl = createPlayButton(startPlayback);
-            playControl.addTo(map);
-        }
+    if (playControl) {
+        map.removeControl(playControl);
     }
+    playControl = createPlayButton(startPlayback);
+    playControl.addTo(map);
+    
 
     // Compute Cumulative Distance (in miles)
     let cumDist = 0;
@@ -668,7 +668,6 @@ async function loadRoute(trackData, pointData) {
         }
     });
     // I would like the checkbox to default to true
-    showPlayButton();
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
     // document.getElementById("playRoute").onclick = startPlayback;
