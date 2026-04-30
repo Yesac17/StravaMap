@@ -64,7 +64,7 @@ function createPlayButton(onClick){
 
         L.DomEvent.disableClickPropagation(button);
         L.DomEvent.on(button, "click", onClick);
-        
+
         return div;
     };
     return playButton;
@@ -403,6 +403,15 @@ async function loadRoute(trackData, pointData) {
         }, 30);
     }
 
+    let playControl = null;
+
+    function showPlayButton() {
+        if (!playControl) {
+            playControl = createPlayButton(startPlayback);
+            playControl.addTo(map);
+        }
+    }
+
     // Compute Cumulative Distance (in miles)
     let cumDist = 0;
     for (let i = 0; i < coords.length; i++) {
@@ -417,9 +426,9 @@ async function loadRoute(trackData, pointData) {
 
     let isSyncing = false;
 
-function makeSyncHandlers(sourceChart, targetChart, coords) {
+    function makeSyncHandlers(sourceChart, targetChart, coords) {
   // clear/hide everything (used by external/onHover and by mouseleave)
-  function hideAll() {
+    function hideAll() {
     // hide hover marker & popup
     hoverMarker.setStyle({ opacity: 0, fillOpacity: 0 });
     if (hoverMarker.isPopupOpen && hoverMarker.isPopupOpen()) hoverMarker.closePopup();
@@ -663,8 +672,6 @@ function makeSyncHandlers(sourceChart, targetChart, coords) {
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
     // document.getElementById("playRoute").onclick = startPlayback;
-    createPlayButton(startPlayback).addTo(map);
-
 
     // ==================== 5. BUILD CHARTS ====================
 
