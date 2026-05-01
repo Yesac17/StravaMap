@@ -45,7 +45,7 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
-function createPlayControls(onPlay, onPause, onReset){
+function createPlayControls(onPlay, onPause, onReplay){
     const controlsButton = L.control({ position: "bottomleft"});
 
     controlsButton.onAdd = function() {
@@ -64,7 +64,7 @@ function createPlayControls(onPlay, onPause, onReset){
         L.DomEvent.disableScrollPropagation(div);
         L.DomEvent.on(playBtn, "click", onPlay);
         L.DomEvent.on(pauseBtn, "click", onPause);
-        L.DomEvent.on(resetBtn, "click", onReset);
+        L.DomEvent.on(replayBtn, "click", onReplay);
 
         return div;
     };
@@ -445,7 +445,7 @@ async function loadRoute(trackData, pointData) {
     playControl = createPlayControls({
         onPlay: startPlayback,
         onPause: pausePlayback,
-        onReset: resetPlayback
+        onReplay: resetPlayback
     });
     playControl.addTo(map);
     
