@@ -396,12 +396,13 @@ async function loadRoute(trackData, pointData) {
     function startPlayback() {
         if (playbackTimer) clearInterval(playbackTimer);
         
-        playbackIndex = 0;
-        playbackTrail.setLatLngs([]);
-        playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
-        playbackTrail.bringToFront();
-        playbackMarker.setStyle({ opacity: 1, fillOpacity: 1 });
-
+        if (playbackIndex === 0) {
+            playbackIndex = 0;
+            playbackTrail.setLatLngs([]);
+            playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
+            playbackTrail.bringToFront();
+            playbackMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+        }
 
         playbackTimer = setInterval(() => {
             if (playbackIndex >= coords.length) {
