@@ -45,7 +45,7 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
-function createPlayControls({handlePlaybackButton}){
+function createPlayControls(handlePlaybackButton){
     const controlsButton = L.control({ position: "bottomleft"});
 
     controlsButton.onAdd = function() {
@@ -458,7 +458,7 @@ async function loadRoute(trackData, pointData) {
 
         if(playbackState === "playing") {
             btn.textContent = "⏸";
-        } else if (playbackState === "finished") {
+        } else if (playbackState === "stopped") {
             btn.textContent = "⟲";
         } else {
             btn.textContent = "▶";
