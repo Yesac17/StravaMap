@@ -76,6 +76,7 @@ function createPlayControls(handlePlaybackButton){
     return controlsButton;
 }
 let playControl = null;
+let playbackState = "paused";
 
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
