@@ -475,7 +475,7 @@ async function loadRoute(trackData, pointData) {
         pausePlayback();
         } else if (playbackState === "paused" ){
         startPlayback();
-        } else if (playbackState === "finished"){
+        } else if (playbackState === "stopped"){
         resetPlayback();
         startPlayback();
         } else{
