@@ -51,6 +51,10 @@ function createPlayControls({onPlay, onPause, onReplay}){
     controlsButton.onAdd = function() {
         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 
+        const mainBtn = L.DomUtil.create("button", "playback-btn", div);
+        mainBtn.id = "playbackMainBtn";
+        mainBtn.innerHTML = "▶";
+
         const playBtn = L.DomUtil.create("button", "playback-btn", div);
         playBtn.innerHTML = "▶";
 
@@ -65,6 +69,7 @@ function createPlayControls({onPlay, onPause, onReplay}){
         L.DomEvent.on(playBtn, "click", onPlay);
         L.DomEvent.on(pauseBtn, "click", onPause);
         L.DomEvent.on(replayBtn, "click", onReplay);
+        L.DomEvent.on(mainBtn, "click", handlePlaybackButton);
 
         return div;
     };
@@ -395,6 +400,8 @@ async function loadRoute(trackData, pointData) {
     // 
     function startPlayback() {
         if (playbackTimer) clearInterval(playbackTimer);
+
+        playbackState = "playing";
         
         if (playbackIndex === 0 || playbackIndex >= coords.length) {
             playbackIndex = 0;
@@ -423,21 +430,54 @@ async function loadRoute(trackData, pointData) {
 
             playbackIndex += 10; // skip points to make it move faster
         }, 30);
+        updatePlaybackButton();
     }
 
     function pausePlayback() {
         if (playbackTimer) {
             clearInterval(playbackTimer);
             playbackTimer = null;
+            playbackState = "paused";
         }
+        updatePlaybackButton();
     }
 
     function resetPlayback() {
         pausePlayback();
+        playbackState = "stopped";
         playbackIndex = 0;
         playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
         playbackTrail.setLatLngs([]);
         playbackMarker.setStyle({ opacity: 0, fillOpacity: 0 });
+        updatePlaybackButton();
+    }
+
+    function updatePlaybackButton() {
+        const btn = document.getElementById("playbackMainBtn");
+        if(!btn) return;
+
+        if(playbackState === "playing") {
+            btn.textContent = "⏸";
+        } else if (playbackState === "finished") {
+            btn.textContent = "⟲";
+        } else {
+            btn.textContent = "▶";
+        }
+
+    }
+
+    function handlePlaybackButton() {
+        if(playbackState === "playing"){
+        pausePlayback();
+        } else if (playbackState === "paused" ){
+        startPlayback();
+        } else if (playbackState === "finished"){
+        resetPlayback();
+        startPlayback();
+        } else{
+            startPlayback();
+        }
+        updatePlaybackButton();
     }
 
     if (playControl) {
