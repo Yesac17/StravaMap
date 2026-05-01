@@ -403,7 +403,7 @@ async function loadRoute(trackData, pointData) {
         if (playbackTimer) clearInterval(playbackTimer);
 
         playbackState = "playing";
-        updatePlaybackButton();
+        
 
         
         if (playbackIndex === 0 || playbackIndex >= coords.length) {
@@ -418,6 +418,7 @@ async function loadRoute(trackData, pointData) {
             if (playbackIndex >= coords.length) {
                 clearInterval(playbackTimer);
                 playbackTimer = null;
+                playbackState = "stopped";
                 return;
             }
 
@@ -433,7 +434,6 @@ async function loadRoute(trackData, pointData) {
 
             playbackIndex += 10; // skip points to make it move faster
         }, 30);
-        playbackState = "stopped";
         updatePlaybackButton();
     }
 
