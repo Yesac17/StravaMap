@@ -45,29 +45,30 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
-function createPlayButton(onClick){
-    const playButton = L.control({ position: "bottomleft"});
+function createPlayControls(onClick){
+    const controlsButton = L.control({ position: "bottomleft"});
 
-    playButton.onAdd = function() {
+    controlsButton.onAdd = function() {
         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 
-        const button = L.DomUtil.create("button", "", div);
-        button.innerHTML = "▶";
+        const playBtn = L.DomUtil.create("button", "playback-btn", div);
+        playBtn.innerHTML = "▶";
 
-        button.style.width = "50px";
-        button.style.height = "50px";
-        button.style.borderRadius = "50%";
-        button.style.backgroundColor = "white";
-        button.style.border = "2px solid #ccc";
-        button.style.cursor = "pointer";
-        button.style.fontSize = "18px";
+        const pauseBtn = L.DomUtil.create("button", "playback-btn", div);
+        pauseBtn.innerHTML = "⏸";
 
-        L.DomEvent.disableClickPropagation(button);
-        L.DomEvent.on(button, "click", onClick);
+        const replayBtn = L.DomUtil.create("button", "playback-btn", div);
+        replayBtn.innerHTML = "⟲";
+
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        L.DomEvent.on(playBtn, "click", onPlay);
+        L.DomEvent.on(pauseBtn, "click", onPause);
+        L.DomEvent.on(resetBtn, "click", onReset);
 
         return div;
     };
-    return playButton;
+    return controlsButton;
 }
 let playControl = null;
 
@@ -381,7 +382,7 @@ async function loadRoute(trackData, pointData) {
         radius: 5,
         color: 'green',
         fillColor: 'green',
-        fillOpacity: 1,
+        fillOpacity: 0,
         opacity: 0
     }).addTo(map);
 
@@ -399,7 +400,7 @@ async function loadRoute(trackData, pointData) {
         playbackTrail.setLatLngs([]);
         playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
         playbackTrail.bringToFront();
-        playbackMarker.setStyle({ opacity: 1 });
+        playbackMarker.setStyle({ opacity: 1, fillOpacity: 1 });
 
 
         playbackTimer = setInterval(() => {
@@ -423,10 +424,29 @@ async function loadRoute(trackData, pointData) {
         }, 30);
     }
 
+    function pausePlayback() {
+        if (playbackTimer) {
+            clearInterval(playbackTimer);
+            playbackTimer = null;
+        }
+    }
+
+    function resetPlayback() {
+        pausePlayback();
+        playbackIndex = 0;
+        playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
+        playbackTrail.setLatLngs([]);
+        playbackMarker.setStyle({ opacity: 0, fillOpacity: 0 });
+    }
+
     if (playControl) {
         map.removeControl(playControl);
     }
-    playControl = createPlayButton(startPlayback);
+    playControl = createPlayControls({
+        onPlay: startPlayback,
+        onPause: pausePlayback,
+        onReset: resetPlayback
+    });
     playControl.addTo(map);
     
 
@@ -688,7 +708,6 @@ async function loadRoute(trackData, pointData) {
     // I would like the checkbox to default to true
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
-    // document.getElementById("playRoute").onclick = startPlayback;
 
     // ==================== 5. BUILD CHARTS ====================
 
