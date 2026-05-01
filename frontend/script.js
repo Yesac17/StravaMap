@@ -396,7 +396,7 @@ async function loadRoute(trackData, pointData) {
     function startPlayback() {
         if (playbackTimer) clearInterval(playbackTimer);
         
-        if (playbackIndex === 0 || playbackIndex === coords.length) {
+        if (playbackIndex === 0 || playbackIndex >= coords.length) {
             playbackIndex = 0;
             playbackTrail.setLatLngs([]);
             playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
