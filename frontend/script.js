@@ -45,7 +45,7 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
-function createPlayControls(onClick){
+function createPlayControls(onPlay, onPause, onReset){
     const controlsButton = L.control({ position: "bottomleft"});
 
     controlsButton.onAdd = function() {
