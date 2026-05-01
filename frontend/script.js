@@ -431,6 +431,7 @@ async function loadRoute(trackData, pointData) {
 
             playbackIndex += 10; // skip points to make it move faster
         }, 30);
+        playbackState = "finished";
         updatePlaybackButton();
     }
 
