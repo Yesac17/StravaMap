@@ -45,7 +45,7 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
-function createPlayControls({onPlay, onPause, onReplay}){
+function createPlayControls({handlePlaybackButton}){
     const controlsButton = L.control({ position: "bottomleft"});
 
     controlsButton.onAdd = function() {
@@ -55,20 +55,20 @@ function createPlayControls({onPlay, onPause, onReplay}){
         mainBtn.id = "playbackMainBtn";
         mainBtn.innerHTML = "▶";
 
-        const playBtn = L.DomUtil.create("button", "playback-btn", div);
-        playBtn.innerHTML = "▶";
+        // const playBtn = L.DomUtil.create("button", "playback-btn", div);
+        // playBtn.innerHTML = "▶";
 
-        const pauseBtn = L.DomUtil.create("button", "playback-btn", div);
-        pauseBtn.innerHTML = "⏸";
+        // const pauseBtn = L.DomUtil.create("button", "playback-btn", div);
+        // pauseBtn.innerHTML = "⏸";
 
-        const replayBtn = L.DomUtil.create("button", "playback-btn", div);
-        replayBtn.innerHTML = "⟲";
+        // const replayBtn = L.DomUtil.create("button", "playback-btn", div);
+        // replayBtn.innerHTML = "⟲";
 
         L.DomEvent.disableClickPropagation(div);
         L.DomEvent.disableScrollPropagation(div);
-        L.DomEvent.on(playBtn, "click", onPlay);
-        L.DomEvent.on(pauseBtn, "click", onPause);
-        L.DomEvent.on(replayBtn, "click", onReplay);
+        // L.DomEvent.on(playBtn, "click", onPlay);
+        // L.DomEvent.on(pauseBtn, "click", onPause);
+        // L.DomEvent.on(replayBtn, "click", onReplay);
         L.DomEvent.on(mainBtn, "click", handlePlaybackButton);
 
         return div;
@@ -483,11 +483,7 @@ async function loadRoute(trackData, pointData) {
     if (playControl) {
         map.removeControl(playControl);
     }
-    playControl = createPlayControls({
-        onPlay: startPlayback,
-        onPause: pausePlayback,
-        onReplay: resetPlayback
-    });
+    playControl = createPlayControls(handlePlaybackButton);
     playControl.addTo(map);
     
 
