@@ -419,6 +419,7 @@ async function loadRoute(trackData, pointData) {
                 clearInterval(playbackTimer);
                 playbackTimer = null;
                 playbackState = "stopped";
+                updatePlaybackButton();
                 return;
             }
 
