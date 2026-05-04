@@ -72,7 +72,7 @@ function createPlayControls({ handlePlaybackButton, cyclePlaybackSpeed }) {
 }
 
 let playControl = null;
-let playbackState = "paused";
+let playbackState = "stopped";
 let playbackSpeed = 10;
 
 L.control.layers(baseMaps).addTo(map);
@@ -415,7 +415,7 @@ async function loadRoute(trackData, pointData) {
             if (playbackIndex >= coords.length) {
                 clearInterval(playbackTimer);
                 playbackTimer = null;
-                playbackState = "stopped";
+                playbackState = "finished";
                 updatePlaybackButton();
                 return;
             }
@@ -460,7 +460,7 @@ async function loadRoute(trackData, pointData) {
 
         if(playbackState === "playing") {
             btn.textContent = "⏸";
-        } else if (playbackState === "stopped") {
+        } else if (playbackState === "finished") {
             btn.textContent = "⟲";
         } else {
             btn.textContent = "▶";
@@ -505,6 +505,8 @@ async function loadRoute(trackData, pointData) {
     }
     playControl = createPlayControls({handlePlaybackButton, cyclePlaybackSpeed});
     playControl.addTo(map);
+    updatePlaybackButton();
+    updateSpeedButton();
     
 
     // Compute Cumulative Distance (in miles)

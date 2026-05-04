@@ -168,6 +168,7 @@ header {
     background: white;
     border: 2px solid #ccc;
     border-radius: 999px;
+    z-index: 1000;
 }
 
 .playback-btn {
