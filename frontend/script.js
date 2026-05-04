@@ -49,6 +49,8 @@ function createPlayControls({ handlePlaybackButton, cyclePlaybackSpeed }) {
     const controlsButton = L.control({ position: "bottomleft" });
 
     controlsButton.onAdd = function () {
+        console.log("play controls added");
+
         const div = L.DomUtil.create("div", "leaflet-control playback-controls");
 
         const mainBtn = L.DomUtil.create("button", "playback-btn", div);
@@ -387,7 +389,7 @@ async function loadRoute(trackData, pointData) {
         fillColor: 'green',
         fillOpacity: 0,
         opacity: 0
-    }).addTo(map);
+    }).addTo(rouetGroup);
 
     // creating playback trail
     let playbackTrail = L.polyline([], {
