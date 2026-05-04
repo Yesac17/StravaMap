@@ -78,6 +78,8 @@ let playbackState = "stopped";
 let playbackSpeed = 1;
 const speeds = [1, 2, 4, 8, 16];
 let speedIndex = 0;
+let animationFrame = null;
+
 
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
@@ -123,6 +125,15 @@ const markerGroup = L.layerGroup().addTo(map);
 
     let currentCharts = {elevation: null, pace: null, hr: null, cad: null};
     let currentHandlers = {elevation: null, pace: null, hr: null, cad: null};
+
+function stopPlaybackAnimation() {
+    if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+    }
+
+    playbackState = "stopped";
+}
 
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
 const fileInp = document.getElementById('fileInput');
@@ -256,6 +267,7 @@ const deleteButton = document.getElementById('deleteRoute');
 loadSavedRoutes();
 
 dropdown.addEventListener('change', async function () {
+    stopPlaybackAnimation();
     const fileInputDiv = document.getElementsByClassName('upload-container')
     routeGroup.clearLayers();
     markerGroup.clearLayers();
@@ -381,7 +393,6 @@ async function loadRoute(trackData, pointData) {
     });
 
     // Route Playback
-    let animationFrame = null;
     let playbackIndex = 0;
 
     // creating playback circle
