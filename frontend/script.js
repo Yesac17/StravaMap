@@ -379,7 +379,7 @@ async function loadRoute(trackData, pointData) {
     });
 
     // Route Playback
-
+    let animationFrame = null;
     let playbackIndex = 0;
     let playbackTimer = null;
 
@@ -400,60 +400,72 @@ async function loadRoute(trackData, pointData) {
 
     // 
     function startPlayback() {
-        if (playbackTimer) clearInterval(playbackTimer);
+        if (animationFrame);
 
         playbackState = "playing";
-        
+        updatePlaybackButton();
 
-        
-        if (playbackIndex === 0 || playbackIndex >= coords.length) {
-            playbackIndex = 0;
-            playbackTrail.setLatLngs([]);
-            playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
-            playbackTrail.bringToFront();
-            playbackMarker.setStyle({ opacity: 1, fillOpacity: 1 });
-        }
+        playbackMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+        playbackTrail.bringToFront();
 
-        playbackTimer = setInterval(() => {
+        let lastTime = null;
+
+        function animate(timeStamp) {
+            if (!lastTime) lastTime = timeStamp;
+
+            const elapsed = timestamp - lastTime;
+            lastTime = timestamp;
+
+            playbackIndex += (elapsed / 30) * playbackSpeed;
+
             if (playbackIndex >= coords.length) {
-                clearInterval(playbackTimer);
-                playbackTimer = null;
+                playbackIndex = coords.length - 1;
                 playbackState = "finished";
+                animationFrame = null;
                 updatePlaybackButton();
                 return;
             }
 
-            const point = coords[playbackIndex];
+            const i = Math.floor(playbackIndex);
+            const t = playbackIndex - i;
 
-            playbackMarker.setLatLng([point.lat, point.lon]);
+            const p1 = coords[i];
+            const p2 = coords[i+1];
+
+            const lat = p1.lat + (p2.lat - p1.lat) * t;
+            const lon = p1.lon + (p2.lon - p1.lon) * t;
+
+            playbackMarket.setLatLng([lat, lon]);
 
             const traveledCoords = coords
-                .slice(0, playbackIndex + 1)
+                .slice(0, i + 1)
                 .map(p => [p.lat, p.lon]);
 
             playbackTrail.setLatLngs(traveledCoords);
 
-            playbackIndex += playbackSpeed; // skip points to make it move faster
-        }, 30);
-        updatePlaybackButton();
+            animationFrame = requestAnimationFrame(animate);
+        }
+        animationFrame = requestAnimationFrame(animate);
     }
 
     function pausePlayback() {
-        if (playbackTimer) {
-            clearInterval(playbackTimer);
-            playbackTimer = null;
+        if (animationFrame) {
+            clearAnimationFrame(animationFrame);
+            animationFrame = null;
             playbackState = "paused";
+            updatePlaybackButton();
         }
-        updatePlaybackButton();
     }
 
     function resetPlayback() {
         pausePlayback();
         playbackState = "stopped";
         playbackIndex = 0;
+
         playbackMarker.setLatLng([coords[0].lat, coords[0].lon]);
         playbackTrail.setLatLngs([]);
         playbackMarker.setStyle({ opacity: 0, fillOpacity: 0 });
+
         updatePlaybackButton();
     }
 
@@ -486,9 +498,9 @@ async function loadRoute(trackData, pointData) {
     }
 
     function cyclePlaybackSpeed() {
-        if (playbackSpeed === 10) playbackSpeed = 20;
-        else if (playbackSpeed === 20) playbackSpeed = 40;
-        else playbackSpeed = 10;
+        if (playbackSpeed === 1) playbackSpeed = 2;
+        else if (playbackSpeed === 2) playbackSpeed = 4;
+        else playbackSpeed = 1;
 
         updateSpeedButton();
     }
@@ -497,10 +509,7 @@ async function loadRoute(trackData, pointData) {
         const btn = document.getElementById("speedBtn");
         if (!btn) return;
 
-        btn.textContent =
-            playbackSpeed === 10 ? "1x" :
-            playbackSpeed === 20 ? "2x" :
-            "4x";
+        btn.textContent = `${playbackSpeed}x`;
     }
 
     if (playControl) {
