@@ -432,6 +432,11 @@ async function loadRoute(trackData, pointData) {
 
             if (playbackIndex >= coords.length - 1) {
                 playbackIndex = coords.length - 1;
+
+                const last = coords[coords.length - 1];
+
+                playbackMarker.setLatLng([last.lat, last.lon]);
+
                 playbackState = "finished";
                 animationFrame = null;
                 updatePlaybackButton();
