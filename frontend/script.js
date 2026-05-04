@@ -438,6 +438,8 @@ async function loadRoute(trackData, pointData) {
 
             playbackMarker.setLatLng([lat, lon]);
 
+            map.panTo([lat, lon], { animate: true });
+
             const traveledCoords = coords
                 .slice(0, i + 1)
                 .map(p => [p.lat, p.lon]);
