@@ -361,6 +361,7 @@ async function deleteRoute(routeId) {
 
 
 async function loadRoute(trackData, pointData) {
+    playbackState = "stopped";
     const polyline = L.geoJSON(trackData, {
             style: { color: 'black', weight: 4 }            
         }).addTo(routeGroup);
