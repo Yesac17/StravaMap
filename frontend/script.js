@@ -55,28 +55,26 @@ function createPlayControls(handlePlaybackButton){
         mainBtn.id = "playbackMainBtn";
         mainBtn.innerHTML = "▶";
 
-        // const playBtn = L.DomUtil.create("button", "playback-btn", div);
-        // playBtn.innerHTML = "▶";
-
-        // const pauseBtn = L.DomUtil.create("button", "playback-btn", div);
-        // pauseBtn.innerHTML = "⏸";
-
-        // const replayBtn = L.DomUtil.create("button", "playback-btn", div);
-        // replayBtn.innerHTML = "⟲";
-
         L.DomEvent.disableClickPropagation(div);
         L.DomEvent.disableScrollPropagation(div);
-        // L.DomEvent.on(playBtn, "click", onPlay);
-        // L.DomEvent.on(pauseBtn, "click", onPause);
-        // L.DomEvent.on(replayBtn, "click", onReplay);
+      
         L.DomEvent.on(mainBtn, "click", handlePlaybackButton);
+
+        const speedBtn = L.DomUtil.create("button", "playback-btn", div);
+        speedBtn.id = "speedBtn";
+        speedBtn.textContent = "1x";
+
+        L.DomEvent.on(speedBtn, "click", cyclePlaybackSpeed);
 
         return div;
     };
+
+    
     return controlsButton;
 }
 let playControl = null;
 let playbackState = "paused";
+let playbackSpeed = 10;
 
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
@@ -433,7 +431,7 @@ async function loadRoute(trackData, pointData) {
 
             playbackTrail.setLatLngs(traveledCoords);
 
-            playbackIndex += 10; // skip points to make it move faster
+            playbackIndex += playbackSpeed; // skip points to make it move faster
         }, 30);
         updatePlaybackButton();
     }
