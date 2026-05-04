@@ -45,7 +45,7 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
-function createPlayControls(handlePlaybackButton){
+function createPlayControls({handlePlaybackButton, cyclePlaybackSpeed}){
     const controlsButton = L.control({ position: "bottomleft"});
 
     controlsButton.onAdd = function() {
@@ -483,10 +483,27 @@ async function loadRoute(trackData, pointData) {
         updatePlaybackButton();
     }
 
+    function cyclePlaybackSpeed() {
+        if (playbackSpeed === 10) playbackSpeed = 20;
+        else if (playbackSpeed === 20) playbackSpeed = 40;
+        else playbackSpeed = 10;
+
+        updateSpeedButton();
+    }
+
+    function updateSpeedButton() {
+        const btn = document.getElementById("speedBtn");
+        if(!btn) return;
+
+        if(playbackSpeed === 10) btn.textContent = "1x";
+        else if (playbackSpeed === 20) btn.textContent = "2x";
+        else if (playbackSpeed === 40) btn.textContent = "4x";
+    }
+
     if (playControl) {
         map.removeControl(playControl);
     }
-    playControl = createPlayControls(handlePlaybackButton);
+    playControl = createPlayControls({handlePlaybackButton, cyclePlaybackSpeed});
     playControl.addTo(map);
     
 
