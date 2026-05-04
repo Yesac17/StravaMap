@@ -413,8 +413,8 @@ async function loadRoute(trackData, pointData) {
         function animate(timeStamp) {
             if (!lastTime) lastTime = timeStamp;
 
-            const elapsed = timestamp - lastTime;
-            lastTime = timestamp;
+            const elapsed = timeStamp - lastTime;
+            lastTime = timeStamp;
 
             playbackIndex += (elapsed / 30) * playbackSpeed;
 
