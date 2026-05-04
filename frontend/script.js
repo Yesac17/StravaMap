@@ -383,7 +383,6 @@ async function loadRoute(trackData, pointData) {
     // Route Playback
     let animationFrame = null;
     let playbackIndex = 0;
-    let playbackTimer = null;
 
     // creating playback circle
     const playbackMarker = L.circleMarker([coords[0].lat, coords[0].lon], {
@@ -420,7 +419,7 @@ async function loadRoute(trackData, pointData) {
 
             playbackIndex += (elapsed / 30) * playbackSpeed;
 
-            if (playbackIndex >= coords.length) {
+            if (playbackIndex >= coords.length - 1) {
                 playbackIndex = coords.length - 1;
                 playbackState = "finished";
                 animationFrame = null;
@@ -487,18 +486,16 @@ async function loadRoute(trackData, pointData) {
     }
 
     function handlePlaybackButton() {
-        if(playbackState === "playing"){
+    if (playbackState === "playing") {
         pausePlayback();
-        } else if (playbackState === "paused" ){
-        startPlayback();
-        } else if (playbackState === "stopped"){
+    } else if (playbackState === "finished") {
         resetPlayback();
         startPlayback();
-        } else{
-            startPlayback();
-        }
-        updatePlaybackButton();
+    } else {
+        // stopped or paused
+        startPlayback();
     }
+}
 
     function cyclePlaybackSpeed() {
         speedIndex = (speedIndex + 1) % speeds.length;
