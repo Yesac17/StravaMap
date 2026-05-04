@@ -435,7 +435,7 @@ async function loadRoute(trackData, pointData) {
             const lat = p1.lat + (p2.lat - p1.lat) * t;
             const lon = p1.lon + (p2.lon - p1.lon) * t;
 
-            playbackMarket.setLatLng([lat, lon]);
+            playbackMarker.setLatLng([lat, lon]);
 
             const traveledCoords = coords
                 .slice(0, i + 1)
