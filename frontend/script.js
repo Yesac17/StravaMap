@@ -75,7 +75,7 @@ function createPlayControls({ handlePlaybackButton, cyclePlaybackSpeed }) {
 
 let playControl = null;
 let playbackState = "stopped";
-let playbackSpeed = 10;
+let playbackSpeed = 1;
 
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
@@ -400,7 +400,7 @@ async function loadRoute(trackData, pointData) {
 
     // 
     function startPlayback() {
-        if (animationFrame);
+        if (animationFrame) return;
 
         playbackState = "playing";
         updatePlaybackButton();
@@ -440,7 +440,8 @@ async function loadRoute(trackData, pointData) {
             const traveledCoords = coords
                 .slice(0, i + 1)
                 .map(p => [p.lat, p.lon]);
-
+                
+            traveledCoords.push([lat, lon]);
             playbackTrail.setLatLngs(traveledCoords);
 
             animationFrame = requestAnimationFrame(animate);
@@ -450,7 +451,7 @@ async function loadRoute(trackData, pointData) {
 
     function pausePlayback() {
         if (animationFrame) {
-            clearAnimationFrame(animationFrame);
+            cancelAnimationFrame(animationFrame);
             animationFrame = null;
             playbackState = "paused";
             updatePlaybackButton();
