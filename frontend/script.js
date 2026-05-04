@@ -45,33 +45,32 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
-function createPlayControls({handlePlaybackButton, cyclePlaybackSpeed}){
-    const controlsButton = L.control({ position: "bottomleft"});
+function createPlayControls({ handlePlaybackButton, cyclePlaybackSpeed }) {
+    const controlsButton = L.control({ position: "bottomleft" });
 
-    controlsButton.onAdd = function() {
-        const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+    controlsButton.onAdd = function () {
+        const div = L.DomUtil.create("div", "leaflet-control playback-controls");
 
         const mainBtn = L.DomUtil.create("button", "playback-btn", div);
         mainBtn.id = "playbackMainBtn";
-        mainBtn.innerHTML = "▶";
-
-        L.DomEvent.disableClickPropagation(div);
-        L.DomEvent.disableScrollPropagation(div);
-      
-        L.DomEvent.on(mainBtn, "click", handlePlaybackButton);
+        mainBtn.textContent = "▶";
 
         const speedBtn = L.DomUtil.create("button", "playback-btn", div);
         speedBtn.id = "speedBtn";
         speedBtn.textContent = "1x";
 
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+
+        L.DomEvent.on(mainBtn, "click", handlePlaybackButton);
         L.DomEvent.on(speedBtn, "click", cyclePlaybackSpeed);
 
         return div;
     };
 
-    
     return controlsButton;
 }
+
 let playControl = null;
 let playbackState = "paused";
 let playbackSpeed = 10;
@@ -493,11 +492,12 @@ async function loadRoute(trackData, pointData) {
 
     function updateSpeedButton() {
         const btn = document.getElementById("speedBtn");
-        if(!btn) return;
+        if (!btn) return;
 
-        if(playbackSpeed === 10) btn.textContent = "1x";
-        else if (playbackSpeed === 20) btn.textContent = "2x";
-        else if (playbackSpeed === 40) btn.textContent = "4x";
+        btn.textContent =
+            playbackSpeed === 10 ? "1x" :
+            playbackSpeed === 20 ? "2x" :
+            "4x";
     }
 
     if (playControl) {
