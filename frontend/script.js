@@ -437,6 +437,9 @@ async function loadRoute(trackData, pointData) {
 
                 playbackMarker.setLatLng([last.lat, last.lon]);
 
+                const fullTrail = coords.map(p => [p.lat, p.lon]);
+                playbackTrail.setLatLngs(fullTrail);
+
                 playbackState = "finished";
                 animationFrame = null;
                 updatePlaybackButton();
