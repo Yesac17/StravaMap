@@ -389,7 +389,7 @@ async function loadRoute(trackData, pointData) {
         fillColor: 'green',
         fillOpacity: 0,
         opacity: 0
-    }).addTo(rouetGroup);
+    }).addTo(routeGroup);
 
     // creating playback trail
     let playbackTrail = L.polyline([], {
