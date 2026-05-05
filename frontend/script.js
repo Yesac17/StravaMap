@@ -1228,6 +1228,11 @@ function getCodeFromUrl() {
   return params.get("code");
 }
 
+const authCode = getCodeFromUrl();
+
+if (authCode) {
+  console.log("Cognito auth code:", authCode);
+}
 
 // what issues are there with this code?
 // 2. The sync logic for the charts is a bit complex and relies on custom handlers to synchronize tooltips and hover states between charts. This works but could potentially be simplified or made more robust, especially if more charts are added in the future.
