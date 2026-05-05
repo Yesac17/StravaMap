@@ -97,6 +97,7 @@ function createCenterButton(handleCenterButton) {
 }
 
 let playControl = null;
+let centerControl = null;
 let playbackState = "stopped";
 let playbackSpeed = 1;
 const speeds = [1, 2, 4, 8, 16];
