@@ -1205,6 +1205,30 @@ async function loadRoute(trackData, pointData) {
     currentCharts.cad = cadChart;
     currentHandlers.cad = handlers4;
 }
+
+// ==================== 4. LOG IN ====================
+
+function login() {
+  const domain = "https://us-east-2knwe4xhwf.auth.us-east-2.amazoncognito.com";
+  const clientId = "5b7rkt6tvt4uf83vpn6pu08rf";
+  const redirectUri = "https://d2c9sqoatsu7vi.cloudfront.net";
+
+  const url =
+    `${domain}/login?` +
+    `client_id=${clientId}` +
+    `&response_type=code` +
+    `&scope=openid+email+profile` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+  window.location.href = url;
+}
+
+function getCodeFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("code");
+}
+
+
 // what issues are there with this code?
 // 2. The sync logic for the charts is a bit complex and relies on custom handlers to synchronize tooltips and hover states between charts. This works but could potentially be simplified or made more robust, especially if more charts are added in the future.
 // 3. The code for loading and processing the route data is all contained within the loadRoute function, which is called both when a user selects a route from the dropdown and when they upload files. This works but could potentially be refactored to separate concerns more cleanly, such as having separate functions for loading data, processing data, and rendering charts.
