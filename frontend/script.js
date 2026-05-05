@@ -212,6 +212,7 @@ fileInp.addEventListener('change', async function(event) {
         const res = await fetch("https://lai886clh5.execute-api.us-east-2.amazonaws.com/uploadURL", { // Send the FormData to the server using fetch API
             method: "POST",
             headers: {
+                Authorization: `Bearer ${localStorage.getItem("id_token")}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ fileName: fileList[0].name, fileHash: fileHash })
@@ -233,6 +234,7 @@ fileInp.addEventListener('change', async function(event) {
         const uploadRes = await fetch(uploadUrl, {
             method: "PUT",
             headers: {
+                Authorization: `Bearer ${localStorage.getItem("id_token")}`,
                 "Content-Type": "application/gpx+xml"
             },
             body: fileList[0]
@@ -267,7 +269,17 @@ fileInp.addEventListener('change', async function(event) {
 
 async function loadSavedRoutes() {
     console.log("loadSavedRoutes called");
-    const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes");
+    const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes", {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("id_token")}`
+        }
+    });
+
+    if (!response.ok) {
+        console.error("Failed to load routes:", response.status, await response.text());
+        return;
+    }
+
     const routes = await res.json();
 
     for (const route of routes) {
@@ -1236,7 +1248,8 @@ async function exchangeCodeForTokens(code) {
   const response = await fetch(`${domain}/oauth2/token`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
+        Authorization: `Bearer ${localStorage.getItem("id_token")}`,
+        "Content-Type": "application/x-www-form-urlencoded"
     },
     body: new URLSearchParams({
       grant_type: "authorization_code",
@@ -1246,12 +1259,15 @@ async function exchangeCodeForTokens(code) {
     })
   });
 
+  
+
   const data = await response.json();
   console.log("Token response:", data);
 
   if (data.id_token) {
     localStorage.setItem("id_token", data.id_token);
     localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
 
     window.history.replaceState({}, document.title, "/");
   }
