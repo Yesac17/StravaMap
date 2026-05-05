@@ -275,7 +275,7 @@ async function loadSavedRoutes() {
         }
     });
 
-    if (!response.ok) {
+    if (!res.ok) {
         console.error("Failed to load routes:", response.status, await response.text());
         return;
     }
