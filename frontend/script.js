@@ -1228,10 +1228,39 @@ function getCodeFromUrl() {
   return params.get("code");
 }
 
+async function exchangeCodeForTokens(code) {
+  const domain = "https://us-east-2knwe4xhwf.auth.us-east-2.amazoncognito.com";
+  const clientId = "5b7rkt6tvt4uf83vpn6pu08rf";
+  const redirectUri = "https://d2c9sqoatsu7vi.cloudfront.net/";
+
+  const response = await fetch(`${domain}/oauth2/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: clientId,
+      code,
+      redirect_uri: redirectUri
+    })
+  });
+
+  const data = await response.json();
+  console.log("Token response:", data);
+
+  if (data.id_token) {
+    localStorage.setItem("id_token", data.id_token);
+    localStorage.setItem("access_token", data.access_token);
+
+    window.history.replaceState({}, document.title, "/");
+  }
+}
+
 const authCode = getCodeFromUrl();
 
 if (authCode) {
-  console.log("Cognito auth code:", authCode);
+    exchangeCodeForTokens(authCode);
 }
 
 // what issues are there with this code?
