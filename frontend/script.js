@@ -1231,7 +1231,7 @@ function getCodeFromUrl() {
 async function exchangeCodeForTokens(code) {
   const domain = "https://us-east-2knwe4xhwf.auth.us-east-2.amazoncognito.com";
   const clientId = "5b7rkt6tvt4uf83vpn6pu08rf";
-  const redirectUri = "https://d2c9sqoatsu7vi.cloudfront.net/";
+  const redirectUri = "https://d2c9sqoatsu7vi.cloudfront.net";
 
   const response = await fetch(`${domain}/oauth2/token`, {
     method: "POST",
