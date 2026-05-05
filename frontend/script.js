@@ -73,6 +73,29 @@ function createPlayControls({ handlePlaybackButton, cyclePlaybackSpeed }) {
     return controlsButton;
 }
 
+function createCenterButton(handleCenterButton) {
+    const centerButton = L.control({ position: "topleft" });
+
+    centerButton.onAdd = function () {
+        console.log("center button added");
+
+        const div = L.DomUtil.create("div", "leaflet-control center-button");
+
+        const btn = L.DomUtil.create("button", "center-btn", div);
+        btn.id = "centerBtn";
+        btn.textContent = "📍";
+
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+
+        L.DomEvent.on(btn, "click", handleCenterButton);
+
+        return div;
+    };
+
+    return centerButton;
+}
+
 let playControl = null;
 let playbackState = "stopped";
 let playbackSpeed = 1;
@@ -391,6 +414,14 @@ async function loadRoute(trackData, pointData) {
             const temp = extractFromExtension(f.properties.gpxtpx_TrackPointExtension || '', 'atemp');
             return { lat, lon, ele, time, hr, cad, temp };
     });
+
+    // ------ Map Control Buttons ------
+
+    // Center Map on Route
+
+    function handleCenterButton() {
+        map.fitBounds(coords.map(c => [c.lat, c.lon]));
+    }
 
     // Route Playback
     let playbackIndex = 0;
