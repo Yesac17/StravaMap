@@ -423,6 +423,13 @@ async function loadRoute(trackData, pointData) {
         map.fitBounds(coords.map(c => [c.lat, c.lon]));
     }
 
+    if(centerControl) {
+        map.removeControl(centerControl);
+    }
+
+    centerControl = createCenterButton(handleCenterButton);
+    centerControl.addTo(map);
+
     // Route Playback
     let playbackIndex = 0;
 
