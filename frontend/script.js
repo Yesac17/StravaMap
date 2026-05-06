@@ -239,7 +239,6 @@ fileInp.addEventListener('change', async function(event) {
         const uploadRes = await fetch(uploadUrl, {
             method: "PUT",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("id_token")}`,
                 "Content-Type": "application/gpx+xml"
             },
             body: fileList[0]
