@@ -329,14 +329,14 @@ const deleteButton = document.getElementById('deleteRoute');
 
 const token = localStorage.getItem("id_token");
 if(!token){
-    alert("You must be logged in to view and upload routes.");
     loadDemoRoute();
     // if the user is not logged in, then load the demo route and do not show the dropdown or delete button.
     document.getElementById('deleteRoute').style.display = 'none';
     document.getElementById('route-selection').style.display = 'none';
-
+    setLoginStatus("You must be logged in to view and upload routes.")
 }
 else{
+    setLoginStatus("");
     loadSavedRoutes();
 }
 
@@ -1337,6 +1337,11 @@ async function exchangeCodeForTokens(code) {
 
     window.history.replaceState({}, document.title, "/");
   }
+}
+
+const loginStatus = document.getElementById("loginStatus");
+function setLoginStatus(message) {
+    loginStatus.textContent = message;
 }
 
 const authCode = getCodeFromUrl();
