@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: sans-serif;
-    background-color: rgba(212, 70, 19, 0.849)
+    background-color: #b94d1c;
 }
 
 h2 {
@@ -37,7 +37,7 @@ h1 {
     border: 4px solid #2c3e50;
     position: relative;
     /* right: -20%; */
-
+    border-radius: 10px;
 }
 
 #mapandstats {
@@ -61,7 +61,7 @@ h1 {
     background: rgba(255, 255, 255, 0.5);
     border: #2c3e50 solid 2px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    
+    border-radius: 10px;    
 }
 .chart-container1:hover, .chart-container2:hover {
   transform: scale(1.01);
@@ -102,9 +102,10 @@ h1 {
     padding: 1rem;
     min-width: 30%;
     background: rgba(255, 255, 255, 0.5);
-    border: #2c3e50 solid 2px;
+    border: #2c3e50 solid 3px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-
+    background-color: #e9b7a3;
+    border-radius: 10px;
 }
 
 #distance, #elevation, #pace, #time, #route-name, #heartrate, #cadence, #temperature, #date, #start-time {
@@ -128,6 +129,7 @@ h1 {
   min-width: 35%;
   border:#2c3e50 solid 2px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
 }
 
 #pace-container {
@@ -137,6 +139,7 @@ h1 {
   min-width: 35%;
   border:#2c3e50 solid 2px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
 }
 
 .mile-marker {
