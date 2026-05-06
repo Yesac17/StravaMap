@@ -334,7 +334,7 @@ if(!token){
     // if the user is not logged in, then load the demo route and do not show the dropdown or delete button.
     document.getElementById('deleteRoute').style.display = 'none';
     document.getElementById('route-selection').style.display = 'none';
-    setLoginStatus("You must be logged in to view and upload routes.")
+    setLoginStatus("Log in to view and upload your own routes!")
 }
 else{
     setLoginStatus("");
