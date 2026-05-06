@@ -45,6 +45,9 @@ const baseMaps = {
     "Google Hybrid": googleHybrid,
     "Google Terrain": googleTerrain
 };
+
+const mileMarkerCheckbox = document.getElementById('mileMarkers');
+
 function createPlayControls({ handlePlaybackButton, cyclePlaybackSpeed }) {
     const controlsButton = L.control({ position: "bottomleft" });
 
