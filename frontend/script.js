@@ -336,6 +336,8 @@ if(!token){
     document.getElementById('route-selection').style.display = 'none';
     setLoginStatus("Log in to view and upload your own routes!");
     document.getElementById('loginStatus').style.display = "block";
+    mileMarkerCheckbox.checked = false;
+
 
 }
 else{
