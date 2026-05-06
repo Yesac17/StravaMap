@@ -176,6 +176,7 @@ function setUploadStatus(message) {
 
 async function waitForRoute(routeId) {
     const maxAttempts = 15;
+    try{
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         setUploadStatus(`Processing route... ${attempt}/${maxAttempts}`);
         
@@ -199,6 +200,10 @@ async function waitForRoute(routeId) {
             return true;
         }
         await new Promise(r => setTimeout(r, 1000));            
+    }
+    }catch(err){
+        console.error("Error while waiting for route:", err);
+        alert("Try refreshing the page. If the route still doesn't appear, there may have been an error processing the file. Contact support if the issue persists.");
     }
 
     return false;
