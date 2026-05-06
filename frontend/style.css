@@ -190,7 +190,7 @@ header {
     font-size: 18px;
 }
 
-.loginButton, .logoutButton {
+#loginButton, #logoutButton {
     position: absolute;
     top: 15px;
     right: 15px;
