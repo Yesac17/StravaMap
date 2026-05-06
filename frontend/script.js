@@ -110,7 +110,6 @@ let animationFrame = null;
 
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
-updateAuthUI();
 // ==================== 2. HELPER FUNCTIONS ======================
 
 function updateAuthUI() {
@@ -353,6 +352,10 @@ async function loadDemoRoute() {
 
     loadRoute(trackData, pointData);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateAuthUI();
+});
 
 const dropdown = document.getElementById('route');
 const deleteButton = document.getElementById('deleteRoute');
