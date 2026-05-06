@@ -244,11 +244,6 @@ header {
     margin-top: 10px;
 }
 
-.top-section {
-    display: flex;
-    gap: 24px;
-}
-
 .left-panel {
     display: flex;
     flex-direction: column;
@@ -256,8 +251,10 @@ header {
 }
 
 .scroll-hint {
-    margin-top: 25px;
     text-align: center;
     font-style: italic;
+    font-size: 1.1rem;
+    color: #2b3a55;
+    margin-top: 20px;
     opacity: 0.8;
 }
