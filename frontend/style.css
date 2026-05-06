@@ -227,7 +227,7 @@ header {
     color: white;
 }
 
-.route-controls {
+#route-controls {
     display: flex;
     align-items: center;
     justify-content: center;
