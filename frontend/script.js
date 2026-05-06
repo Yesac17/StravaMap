@@ -1248,7 +1248,6 @@ async function exchangeCodeForTokens(code) {
   const response = await fetch(`${domain}/oauth2/token`, {
     method: "POST",
     headers: {
-        Authorization: {
         "Content-Type": "application/x-www-form-urlencoded"
     },
     body: new URLSearchParams({
