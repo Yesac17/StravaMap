@@ -184,8 +184,16 @@ async function waitForRoute(routeId) {
                 Authorization: `Bearer ${localStorage.getItem("id_token")}`,
             }
         });
+
+        if (!res.ok) {
+            console.error("Polling failed:", res.status, await res.text());
+            return false;
+        }
+
         const routes = await res.json();
 
+        console.log("Waiting for:", routeId);
+        console.log("Polling routes:", routes.map(r => r.route_id));
 
         if(routes.some(r => r.route_id === routeId)){
             return true;
