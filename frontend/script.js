@@ -1342,6 +1342,8 @@ async function exchangeCodeForTokens(code) {
     localStorage.setItem("refresh_token", data.refresh_token);
 
     window.history.replaceState({}, document.title, "/");
+
+    location.reload();
   }
 }
 
