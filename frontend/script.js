@@ -829,8 +829,9 @@ async function loadRoute(trackData, pointData) {
     
     // --- Map Popups on Click ---
     const popup = L.popup();
-    // question.
-    polyline.on('mousemove', function(e) {
+    // currently pop ups appear if the route is moused over, but i think that is too annoying. I want to change it so that the popups only appear when the route is clicked, and disappear when the mouse is clicked anywhere else on the map.
+    // to do this I will 
+    polyline.on('click', function(e) {
             const latlng = e.latlng;
 
             // find nearest coordinate
