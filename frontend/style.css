@@ -73,7 +73,7 @@ h1 {
   transition: 0.2s ease;
 }
 
-#map:hover, #deleteRoute:hover, #loginButton:hover, #logoutButton:hover {
+#map:hover, #deleteRoute:hover, #loginButton:hover, #logoutButton:hover, #route:hover {
   transform: scale(1.01);
   transition: 0.2s ease;
 }
