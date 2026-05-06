@@ -334,10 +334,12 @@ if(!token){
     // if the user is not logged in, then load the demo route and do not show the dropdown or delete button.
     document.getElementById('deleteRoute').style.display = 'none';
     document.getElementById('route-selection').style.display = 'none';
-    setLoginStatus("Log in to view and upload your own routes!")
+    setLoginStatus("Log in to view and upload your own routes!");
+    document.getElementById('deleteRoute').style.display = "block";
+
 }
 else{
-    setLoginStatus("");
+    document.getElementById('deleteRoute').style.display = "none";
     loadSavedRoutes();
 }
 
