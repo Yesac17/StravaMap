@@ -1287,6 +1287,21 @@ function login() {
   window.location.href = url;
 }
 
+function logout() {
+  localStorage.removeItem("id_token");
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+
+  const domain = "https://us-east-2knwe4xhwf.auth.us-east-2.amazoncognito.com";
+  const clientId = "5b7rkt6tvt4uf83vpn6pu08rf";
+  const logoutUri = "https://d2c9sqoatsu7vi.cloudfront.net";
+
+  window.location.href =
+    `${domain}/logout?` +
+    `client_id=${clientId}` +
+    `&logout_uri=${encodeURIComponent(logoutUri)}`;
+}
+
 function getCodeFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get("code");
