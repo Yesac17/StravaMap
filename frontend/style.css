@@ -16,6 +16,7 @@ h1 {
     text-align: center;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
+    font-size: 3rem;
     color: #2c3e50;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -187,7 +188,7 @@ h1 {
 
 header {
     background: rgba(212, 70, 19, 0.649);
-    padding: 1rem 0;
+    padding: 10px 0 15px 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 1rem;
     /* position: sticky; */
