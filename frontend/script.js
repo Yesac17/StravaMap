@@ -383,21 +383,14 @@ dropdown.addEventListener('change', async function () {
 
             const route = await res.json();
 
+            const tracks = route.trackUrl;
+            const trackPoints = route.pointUrl;
+
             if (!tracks || !trackPoints) {
                 console.error("Missing track URL or point URL:", route);
                 return;
             }
 
-            const tracks = route.trackUrl;
-            const trackPoints = route.pointUrl;
-
-            if (!trackRes.ok || !pointRes.ok) {
-                console.error("Failed to fetch route files:", {
-                    trackStatus: trackRes.status,
-                    pointStatus: pointRes.status
-                });
-                return;
-            }
 
             const [trackData, pointData] = await Promise.all([
                 fetch(tracks).then(res => res.json()),
