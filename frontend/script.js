@@ -899,7 +899,6 @@ async function loadRoute(trackData, pointData) {
     // I have just added a check box in the html
     // I want to link this checkbox to the mile markers so that when the box is checked, the mile markers appear and when it is unchecked, they disappear.
     // To do this, I will add an event listener to the checkbox that toggles the visibility of the markerGroup layer.
-    const mileMarkerCheckbox = document.getElementById('mileMarkers'); // This line is doing the following: it is getting the checkbox element from the HTML document by its ID 'mileMarkers' and storing it in the variable mileMarkerCheckbox for later use in the event listener.
     mileMarkerCheckbox.addEventListener('change', function() { // This line is adding an event listener to the mileMarkerCheckbox that listens for the 'change' event, which occurs when the checkbox is checked or unchecked. When the event is triggered, it executes the function that follows.
         if (this.checked) { // This line is checking if the checkbox is currently checked (i.e., if this.checked is true). If it is checked, it executes the code block that follows, which adds the markerGroup layer to the map, making the mile markers visible. If it is not checked, it executes the else block, which removes the markerGroup layer from the map, hiding the mile markers.
             map.addLayer(markerGroup);
@@ -907,7 +906,6 @@ async function loadRoute(trackData, pointData) {
             map.removeLayer(markerGroup);
         }
     });
-    // I would like the checkbox to default to true
     polyline.bringToFront();
     map.fitBounds(coords.map(c => [c.lat, c.lon]));
 
