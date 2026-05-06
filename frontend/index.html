@@ -38,26 +38,31 @@
             </form>
             <p id="uploadStatus"></p>
         </div>
-        <div id='mapandstats'>
-            <div id="stats">
-                    <h2>Run Statistics</h2>
-                    <ul>
-                        <li><b>Date:</b><span id = "date">-</span> at <span id ="start-time">-</span></li>
-                        <li><b>Route Name:</b> <span id = "route-name">-</span></li>
-                        <li><b>Time:</b> <span id = "time">-</span></li>
-                        <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
-                        <li><b>Avg Pace:</b> <span id = "pace">-</span> min/mi</li>
-                        <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
-                        <li><b>Avg Heart Rate:</b> <span id = "heartrate">-</span> bpm</li>
-                        <li><b>Avg Cadence:</b> <span id = "cadence">-</span> spm</li>
-                        <li><b>Temperature:</b> <span id="temperature">-</span>°F</li>
-                    </ul>
+        <div class="top-section">
+            <div id='mapandstats'>
+                <div class="left-panel">
+                    <div id="stats">
+                            <h2>Run Statistics</h2>
+                            <ul>
+                                <li><b>Date:</b><span id = "date">-</span> at <span id ="start-time">-</span></li>
+                                <li><b>Route Name:</b> <span id = "route-name">-</span></li>
+                                <li><b>Time:</b> <span id = "time">-</span></li>
+                                <li><b>Distance:</b> <span id = "distance">-</span> mi</li>
+                                <li><b>Avg Pace:</b> <span id = "pace">-</span> min/mi</li>
+                                <li><b>Elevation Gain:</b> <span id = "elevation">-</span> ft</li>
+                                <li><b>Avg Heart Rate:</b> <span id = "heartrate">-</span> bpm</li>
+                                <li><b>Avg Cadence:</b> <span id = "cadence">-</span> spm</li>
+                                <li><b>Temperature:</b> <span id="temperature">-</span>°F</li>
+                            </ul>
+                    </div>
+                    <div class="scroll-hint">
+                        ↓ Scroll for charts ↓
+                    </div>
+                </div>
+                <div id="map"></div>
             </div>
-            <div id="map"></div>
         </div>
-        <div class="scroll-hint">
-            ↓ Scroll for charts ↓
-        </div>
+        
         <div id='milemarkercheck'>
                 <label for="mileMarkers">Show Mile Markers:</label>
                 <input type="checkbox" id="mileMarkers" name="mileMarkers" checked>
