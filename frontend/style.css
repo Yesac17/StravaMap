@@ -2,11 +2,14 @@ body {
     margin: 0;
     font-family: sans-serif;
     background-color: #b94d1c;
+    max-width: 1800px;
+    margin: 0 auto;
 }
 
 h2 {
     font-style: italic;
     text-align: center;
+    font-size: 2.2rem;
 }
 
 h1 {
@@ -34,7 +37,7 @@ h1 {
     height: 60vh;
     width: 60%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border: 4px solid #2c3e50;
+    border: 3px solid #2c3e50;
     position: relative;
     /* right: -20%; */
     border-radius: 10px;
@@ -96,10 +99,12 @@ h1 {
     display: none;
 }
 
+
+
 #stats {
     height: fit-content;
     width: fit-content;
-    padding: 1rem;
+    padding: 30px;
     min-width: 30%;
     background: rgba(255, 255, 255, 0.5);
     border: #2c3e50 solid 3px;
