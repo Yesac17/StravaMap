@@ -203,7 +203,9 @@ async function waitForRoute(routeId) {
     }
     }catch(err){
         console.error("Error while waiting for route:", err);
-        alert("Try refreshing the page. If the route still doesn't appear, there may have been an error processing the file. Contact support if the issue persists.");
+        alert("Upload completed, but the route did not auto-load. Try refreshing the page in a moment.");
+
+        return false;
     }
 
     return false;
