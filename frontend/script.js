@@ -110,7 +110,18 @@ let animationFrame = null;
 
 L.control.layers(baseMaps).addTo(map);
 openStreetMaps.addTo(map);
+updateAuthUI();
 // ==================== 2. HELPER FUNCTIONS ======================
+
+function updateAuthUI() {
+    const loggedIn = !!localStorage.getItem("id_token");
+
+    document.getElementById("loginButton").style.display =
+        loggedIn ? "none" : "inline-block";
+
+    document.getElementById("logoutButton").style.display =
+        loggedIn ? "inline-block" : "none";
+}
 
 // Compute squared distance between two points (used for nearest-point lookup)
 function distanceSq(a,b) {
