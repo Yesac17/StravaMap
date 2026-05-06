@@ -243,3 +243,12 @@ header {
     gap: 12px;
     margin-top: 10px;
 }
+
+.scroll-hint {
+    text-align: center;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #2b3a55;
+    margin-top: 20px;
+    opacity: 0.8;
+}
