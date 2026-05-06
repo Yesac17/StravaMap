@@ -175,7 +175,11 @@ async function waitForRoute(routeId) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         setUploadStatus(`Processing route... ${attempt}/${maxAttempts}`);
         
-        const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes");
+        const res = await fetch("https://qrbnhc4see.execute-api.us-east-2.amazonaws.com/routes",{
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("id_token")}`,
+            }
+        });
         const routes = await res.json();
 
 
