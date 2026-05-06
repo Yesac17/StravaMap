@@ -474,7 +474,12 @@ deleteButton.addEventListener('click', async function() {
 });
 
 async function deleteRoute(routeId) {
-    const res = await fetch(`https://4aliv9sulf.execute-api.us-east-2.amazonaws.com/routes/${routeId}`, { method: "DELETE" });
+    const res = await fetch(`https://4aliv9sulf.execute-api.us-east-2.amazonaws.com/routes/${routeId}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("id_token")}`
+        },
+     method: "DELETE" 
+    });
     const data = await res.json();
     if(!res.ok) {
         const err = await res.json();
