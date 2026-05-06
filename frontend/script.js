@@ -219,7 +219,12 @@ fileInp.addEventListener('change', async function(event) {
         });
         setUploadStatus("Requesting upload permission...");
 
-        if (!res.ok) throw new Error("Failed to create upload URL");
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Upload URL request failed:", res.status, errorText);
+            throw new Error("Failed to create upload URL");
+        }
+
 
         const { duplicate, uploadUrl, key, routeId } = await res.json();
         console.log("Presigned Key: ", key);
