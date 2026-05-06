@@ -153,6 +153,11 @@ h1 {
 #route-delete {
     text-align: center;
     margin-bottom: 1rem;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 header {
