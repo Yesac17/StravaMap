@@ -258,3 +258,83 @@ header {
     margin-top: 40px;
     opacity: 0.8;
 }
+
+@media (max-width: 900px) {
+  body {
+    max-width: none;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    margin-top: 0.75rem;
+  }
+
+  header {
+    padding: 12px 10px 18px;
+  }
+
+  #loginButton,
+  #logoutButton {
+    position: static;
+    margin: 0.5rem auto 0;
+    display: block;
+  }
+
+  #route-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #route {
+    width: 90%;
+    max-width: 360px;
+  }
+
+  #mapandstats {
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px;
+  }
+
+  .left-panel {
+    width: 100%;
+  }
+
+  #stats {
+    width: 90%;
+    min-width: 0;
+    padding: 20px;
+  }
+
+  #map {
+    width: 95%;
+    height: 45vh;
+  }
+
+  #milemarkercheck {
+    text-align: center;
+    padding: 0;
+  }
+
+  #charts {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .chart-container1,
+  .chart-container2,
+  #pace-container,
+  #elevation-container {
+    width: 100%;
+    min-width: 0;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  .scroll-hint {
+    margin-top: 20px;
+  }
+}
