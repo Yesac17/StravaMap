@@ -340,8 +340,7 @@ if(!token){
     setLoginStatus("Log in to view and upload your own routes!");
     document.getElementById('loginStatus').style.display = "block";
     mileMarkerCheckbox.checked = false;
-
-
+    map.removeLayer(markerGroup); // defaulting to no mile markers because it makes the snowman look nice.
 }
 else{
     document.getElementById('loginStatus').style.display = "none";
