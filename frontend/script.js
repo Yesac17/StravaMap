@@ -306,9 +306,40 @@ async function loadSavedRoutes() {
     }
 }
 
+async function loadDemoRoute() {
+    const res = await fetch("https://018mwnj2g2.execute-api.us-east-2.amazonaws.com/demo-route");
+
+    if (!res.ok) {
+        console.error("Failed to load demo route:", res.status, await res.text());
+        return;
+    }
+
+    const route = await res.json();
+
+    const [trackData, pointData] = await Promise.all([
+        fetch(route.trackUrl).then(res => res.json()),
+        fetch(route.pointUrl).then(res => res.json())
+    ]);
+
+    loadRoute(trackData, pointData);
+}
+
 const dropdown = document.getElementById('route');
 const deleteButton = document.getElementById('deleteRoute');
-loadSavedRoutes();
+
+const token = localStorage.getItem("id_token");
+if(!token){
+    alert("You must be logged in to view and upload routes.");
+    loadDemoRoute();
+    // if the user is not logged in, then load the demo route and do not show the dropdown or delete button.
+    document.getElementById('deleteRoute').style.display = 'none';
+    document.getElementById('route-selection').style.display = 'none';
+
+}
+else{
+    loadSavedRoutes();
+}
+
 
 dropdown.addEventListener('change', async function () {
     stopPlaybackAnimation();
@@ -414,8 +445,6 @@ deleteButton.addEventListener('click', async function() {
         return;
     } else if(confirm("Are you sure you want to delete this route? This action cannot be undone.")) {
         await deleteRoute(selectedValue);
-        //loadSavedRoutes(); // Refresh the dropdown after deletion
-        //dropdown.value = '';
         console.log("waiting");
         window.location.reload();
     }
