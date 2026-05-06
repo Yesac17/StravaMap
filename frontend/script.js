@@ -162,6 +162,7 @@ function stopPlaybackAnimation() {
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
 const fileInp = document.getElementById('fileInput');
 const uploadStatus = document.getElementById('uploadStatus');
+const loginStatus = document.getElementById("loginStatus");
 let fileList = [];
 let trackDataUpload = null;
 let pointDataUpload = null;
@@ -1339,7 +1340,6 @@ async function exchangeCodeForTokens(code) {
   }
 }
 
-const loginStatus = document.getElementById("loginStatus");
 function setLoginStatus(message) {
     loginStatus.textContent = message;
 }
