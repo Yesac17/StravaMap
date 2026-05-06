@@ -407,7 +407,11 @@ dropdown.addEventListener('change', async function () {
 
     // if the selected value is not file upload, then fetch the route data from the server and load the route.
     // if the selected value is file upload, then show the file upload interface and wait for the user to upload files. 
-    if(selectedValue !== 'file_upload'){
+    if(selectedValue === 'demo-route'){
+        await loadDemoRoute();
+        return;
+    }
+    else if(selectedValue !== 'file_upload'){
             const res = await fetch(`https://5pouy6pdgh.execute-api.us-east-2.amazonaws.com/routes/${selectedValue}`,{
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("id_token")}`
@@ -449,6 +453,9 @@ deleteButton.addEventListener('click', async function() {
         return;
     } else if (selectedValue === 'file_upload') {
         alert("Cannot delete 'File Upload' option. Please select a saved route to delete.");
+        return;
+    } else if (selectedValue === 'demo-route') {
+        alert("Cannot delete 'Demo Route' option. Please select a saved route to delete.");
         return;
     } else if(confirm("Are you sure you want to delete this route? This action cannot be undone.")) {
         await deleteRoute(selectedValue);
