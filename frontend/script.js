@@ -335,11 +335,11 @@ if(!token){
     document.getElementById('deleteRoute').style.display = 'none';
     document.getElementById('route-selection').style.display = 'none';
     setLoginStatus("Log in to view and upload your own routes!");
-    document.getElementById('deleteRoute').style.display = "block";
+    document.getElementById('loginStatus').style.display = "block";
 
 }
 else{
-    document.getElementById('deleteRoute').style.display = "none";
+    document.getElementById('loginStatus').style.display = "none";
     loadSavedRoutes();
 }
 
