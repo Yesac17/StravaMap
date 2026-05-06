@@ -371,13 +371,33 @@ dropdown.addEventListener('change', async function () {
     // if the selected value is file upload, then show the file upload interface and wait for the user to upload files. 
     if(selectedValue !== 'file_upload'){
             const res = await fetch(`https://5pouy6pdgh.execute-api.us-east-2.amazonaws.com/routes/${selectedValue}`,{
-                Authorization: `Bearer ${localStorage.getItem("id_token")}`
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("id_token")}`
+                }
             });
             
+            if (!res.ok) {
+                console.error("Failed to fetch route by id:", res.status, await res.text());
+                return;
+            }
+
             const route = await res.json();
+
+            if (!tracks || !trackPoints) {
+                console.error("Missing track URL or point URL:", route);
+                return;
+            }
 
             const tracks = route.trackUrl;
             const trackPoints = route.pointUrl;
+
+            if (!trackRes.ok || !pointRes.ok) {
+                console.error("Failed to fetch route files:", {
+                    trackStatus: trackRes.status,
+                    pointStatus: pointRes.status
+                });
+                return;
+            }
 
             const [trackData, pointData] = await Promise.all([
                 fetch(tracks).then(res => res.json()),
