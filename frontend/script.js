@@ -100,9 +100,7 @@ function createCenterButton(handleCenterButton) {
 }
 
 document.getElementById("scrollHint").addEventListener("click", () => {
-    document.querySelector(".charts").scrollIntoView({
-        behavior: "smooth"
-    });
+    document.getElementById("pace-container").scrollIntoView({ behavior: "smooth" });
 });
 
 let playControl = null;
