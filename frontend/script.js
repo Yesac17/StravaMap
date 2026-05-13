@@ -99,6 +99,12 @@ function createCenterButton(handleCenterButton) {
     return centerButton;
 }
 
+document.getElementById("scrollHint").addEventListener("click", () => {
+    document.querySelector(".charts").scrollIntoView({
+        behavior: "smooth"
+    });
+});
+
 let playControl = null;
 let centerControl = null;
 let playbackState = "stopped";
@@ -171,6 +177,31 @@ function stopPlaybackAnimation() {
 
     playbackState = "stopped";
 }
+
+const allTrackPoints = [];
+
+for (let i = 0; i < 200; i++) {
+  allTrackPoints.push({
+    lat: 44.2619 + (Math.random() - .5) * 0.01,
+    lon: -88.4154 + (Math.random() - .5) * 0.01
+  });
+}
+const heatPoints = allTrackPoints.map(point => [
+  point.lat,
+  point.lon,
+  0.5
+]);
+
+const heatLayer = L.heatLayer(heatPoints, {
+  radius: 30,
+  blur: 20,
+  maxZoom: 17
+}).addTo(map);
+
+
+// console.log(L.heatLayer);
+
+
 
 // ==================== 3. ROUTE LOADING & PROCESSING ====================
 const fileInp = document.getElementById('fileInput');
@@ -1317,7 +1348,7 @@ async function loadRoute(trackData, pointData) {
     currentHandlers.cad = handlers4;
 }
 
-// ==================== 4. LOG IN ====================
+// ==================== 6. LOG IN ====================
 
 function login() {
   const domain = "https://us-east-2knwe4xhwf.auth.us-east-2.amazoncognito.com";

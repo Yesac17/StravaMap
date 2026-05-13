@@ -241,6 +241,11 @@ header {
     color: #2b3a55;
     margin-top: 40px;
     opacity: 0.8;
+    cursor: pointer
+}
+
+.scroll-hint:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 900px) {
