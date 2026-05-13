@@ -101,6 +101,7 @@ function createCenterButton(handleCenterButton) {
 
 document.getElementById("scrollHint").addEventListener("click", () => {
     document.getElementById("pace-container").scrollIntoView({ behavior: "smooth" });
+    console.log("scroll hint clicked");
 });
 
 let playControl = null;
