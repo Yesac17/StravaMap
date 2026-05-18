@@ -775,7 +775,7 @@ async function loadRoute(trackData, pointData) {
 
         document.getElementById("liveDistance").textContent =
             point.distanceMi != null
-                ? `${point.distanceMi.toFixed(2)} mi`
+                ? `${point.distanceMi.toFixed(1)} mi`
                 : "--";
 
         document.getElementById("liveElevation").textContent =
