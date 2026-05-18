@@ -184,6 +184,18 @@ function formatElapsed(seconds) {
     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 }
 
+function formatPace(secondsPerMile) {
+    if (secondsPerMile == null || !isFinite(secondsPerMile)) {
+        return "-- /mi";
+    }
+
+    const mins = Math.floor(secondsPerMile / 60);
+    const secs = Math.round(secondsPerMile % 60);
+
+    return `${mins}:${secs.toString().padStart(2, "0")} /mi`;
+}
+
+
 const allTrackPoints = [];
 
 for (let i = 0; i < 200; i++) {
@@ -724,16 +736,38 @@ async function loadRoute(trackData, pointData) {
     // Compute Cumulative Distance (in miles)
     let cumDist = 0;
     const startTime = coords[0].time;
+    const windowSize = 5;
 
     for (let i = 0; i < coords.length; i++) {
-        if(i > 0) {
-            cumDist += haversine(coords[i-1], coords[i]) / 1.609;
+
+        // cumulative distance
+        if (i > 0) {
+            cumDist += haversine(coords[i - 1], coords[i]) / 1.609;
         }
+
         coords[i].distanceMi = cumDist;
-        coords[i].elapsedSec = (coords[i].time - startTime) / 1000;
+
+        // elapsed time
+        coords[i].elapsedSec =
+            (coords[i].time - startTime) / 1000;
+
+        // smoothed current pace
+        let totalDist = 0;
+        let totalTime = 0;
+
+        for (let j = Math.max(1, i - windowSize + 1); j <= i; j++) {
+
+            totalDist +=
+                haversine(coords[j - 1], coords[j]) / 1.609;
+
+            totalTime +=
+                (coords[j].time - coords[j - 1].time) / 1000;
+        }
 
         coords[i].paceSecPerMi =
-            cumDist > 0 ? coords[i].elapsedSec / cumDist : null;
+            totalDist > 0
+                ? totalTime / totalDist
+                : null;
     }
 
     function updateStatsDisplay(point) {
