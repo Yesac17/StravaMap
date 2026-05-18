@@ -177,6 +177,13 @@ function stopPlaybackAnimation() {
     playbackState = "stopped";
 }
 
+function formatElapsed(seconds) {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
+
 const allTrackPoints = [];
 
 for (let i = 0; i < 200; i++) {
@@ -749,11 +756,11 @@ async function loadRoute(trackData, pointData) {
 
         document.getElementById("liveElapsed").textContent =
             point.elapsedSec != null 
-                ? formatElapsed(point.elapsedSec) 
+                ? formatElapsed(point.elapsedSec)
                 : "--";
 
         document.getElementById("livePace").textContent =
-            formatPace(point.paceSecPerMi);
+            formatPace(point.paceSecPerMi); 
     }
 
     if (playControl) {
