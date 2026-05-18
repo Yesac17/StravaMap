@@ -436,6 +436,8 @@ dropdown.addEventListener('change', async function () {
     hoverMarker.setStyle({ opacity: 0, fillOpacity: 0 });
     if (hoverMarker.isPopupOpen && hoverMarker.isPopupOpen()) hoverMarker.closePopup();
 
+    document.getElementById("playbackStats").classList.add("hidden");
+
     // Destroy existing charts if any
     if (currentCharts.elevation) {
         if (currentCharts.elevation.canvas && currentHandlers.elevation?.hide) {
