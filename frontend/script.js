@@ -715,19 +715,22 @@ async function loadRoute(trackData, pointData) {
     }
 
     function updateStatsDisplay(point) {
-        document.getElementById("playback-stats").classList.remove("hidden");
+        document.getElementById("playbackStats").classList.remove("hidden");
 
         document.getElementById("liveDistance").textContent =
-            point.distance ? `${point.distance.toFixed(2)} mi` : "--";
+            point.distance != null
+                ? `${point.distance.toFixed(2)} mi`
+                : "--";
 
         document.getElementById("liveElevation").textContent =
-            point.ele != null ? `${Math.round(point.ele)} ft` : "--";
+            point.ele != null
+                ? `${Math.round(point.ele)} ft`
+                : "--";
 
         document.getElementById("liveHeartRate").textContent =
-            point.hr ? `${point.hr} bpm` : "--";
-
-        document.getElementById("liveCadence").textContent =
-            point.cad ? `${point.cad} spm` : "--";
+            point.hr != null
+                ? `${point.hr} bpm`
+                : "--";
     }
 
     if (playControl) {
