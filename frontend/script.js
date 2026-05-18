@@ -714,11 +714,24 @@ async function loadRoute(trackData, pointData) {
         btn.textContent = `${playbackSpeed}x`;
     }
 
+    // Compute Cumulative Distance (in miles)
+    let cumDist = 0;
+    for (let i = 0; i < coords.length; i++) {
+                if(i > 0) {
+                    cumDist += haversine(coords[i-1], coords[i]) / 1.609;
+                }
+                coords[i].distanceMi = cumDist;
+                coords[i].elapsedSec = (coords[i].time - startTime) / 1000;
+
+                coords[i].paceSecPerMi =
+                    cumDist > 0 ? coords[i].elapsedSec / cumDist : null;
+    }
+
     function updateStatsDisplay(point) {
         document.getElementById("playbackStats").classList.remove("hidden");
 
         document.getElementById("liveDistance").textContent =
-            point.distance != null
+            point.distanceMi != null
                 ? `${point.distance.toFixed(2)} mi`
                 : "--";
 
@@ -731,6 +744,14 @@ async function loadRoute(trackData, pointData) {
             point.hr != null
                 ? `${point.hr} bpm`
                 : "--";
+
+        document.getElementById("liveElapsed").textContent =
+            point.elapsedSec != null 
+                ? formatElapsed(point.elapsedSec) 
+                : "--";
+
+        document.getElementById("livePace").textContent =
+            formatPace(point.paceSecPerMi);
     }
 
     if (playControl) {
@@ -742,14 +763,7 @@ async function loadRoute(trackData, pointData) {
     updateSpeedButton();
     
 
-    // Compute Cumulative Distance (in miles)
-    let cumDist = 0;
-    for (let i = 0; i < coords.length; i++) {
-                if(i > 0) {
-                    cumDist += haversine(coords[i-1], coords[i]) / 1.609;
-                }
-                coords[i].distanceMi = cumDist;
-    }
+
 
 // ==================== 4. Map Interactions ====================
 
@@ -925,7 +939,6 @@ async function loadRoute(trackData, pointData) {
     
     // --- Map Popups on Click ---
     const popup = L.popup();
-    // currently pop ups appear if the route is moused over, but i think that is too annoying. I want to change it so that the popups only appear when the route is clicked, and disappear when the mouse is clicked anywhere else on the map.
     // to do this I will 
     polyline.on('click', function(e) {
             const latlng = e.latlng;
