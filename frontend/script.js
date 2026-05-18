@@ -716,15 +716,17 @@ async function loadRoute(trackData, pointData) {
 
     // Compute Cumulative Distance (in miles)
     let cumDist = 0;
-    for (let i = 0; i < coords.length; i++) {
-                if(i > 0) {
-                    cumDist += haversine(coords[i-1], coords[i]) / 1.609;
-                }
-                coords[i].distanceMi = cumDist;
-                coords[i].elapsedSec = (coords[i].time - startTime) / 1000;
+    const startTime = coords[0].time;
 
-                coords[i].paceSecPerMi =
-                    cumDist > 0 ? coords[i].elapsedSec / cumDist : null;
+    for (let i = 0; i < coords.length; i++) {
+        if(i > 0) {
+            cumDist += haversine(coords[i-1], coords[i]) / 1.609;
+        }
+        coords[i].distanceMi = cumDist;
+        coords[i].elapsedSec = (coords[i].time - startTime) / 1000;
+
+        coords[i].paceSecPerMi =
+            cumDist > 0 ? coords[i].elapsedSec / cumDist : null;
     }
 
     function updateStatsDisplay(point) {
@@ -928,7 +930,6 @@ async function loadRoute(trackData, pointData) {
     // track_points.geojson has property "time": "2025-05-22T14:30:09Z". 
     // I can use this to get the date and start time of the run. However the time zone is probably UTC so I need to convert it to local time.
     // I will only display the date that the activity started on, so I will only need the data from the first coordinate.
-    const startTime = coords[0].time;
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById("date").textContent = startTime.toLocaleDateString(undefined, options);
     
