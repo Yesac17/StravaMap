@@ -633,6 +633,8 @@ async function loadRoute(trackData, pointData) {
             const p1 = coords[i];
             const p2 = coords[i+1];
 
+            updateStatsDisplay(p1);
+
             const lat = p1.lat + (p2.lat - p1.lat) * t;
             const lon = p1.lon + (p2.lon - p1.lon) * t;
 
@@ -710,6 +712,22 @@ async function loadRoute(trackData, pointData) {
         if (!btn) return;
 
         btn.textContent = `${playbackSpeed}x`;
+    }
+
+    function updateStatsDisplay(point) {
+        document.getElementById("playback-stats").classList.remove("hidden");
+
+        document.getElementById("liveDistance").textContent =
+            point.distance ? `${point.distance.toFixed(2)} mi` : "--";
+
+        document.getElementById("liveElevation").textContent =
+            point.ele != null ? `${Math.round(point.ele)} ft` : "--";
+
+        document.getElementById("liveHeartRate").textContent =
+            point.hr ? `${point.hr} bpm` : "--";
+
+        document.getElementById("liveCadence").textContent =
+            point.cad ? `${point.cad} spm` : "--";
     }
 
     if (playControl) {
