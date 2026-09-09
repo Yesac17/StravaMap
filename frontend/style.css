@@ -6,17 +6,17 @@ body {
     margin: 0 auto;
 }
 
-h2 {
-    font-style: italic;
-    text-align: center;
-    font-size: 2.2rem;
+#stats h2 {
+    font-style: normal;
+    font-size: 1.3rem;
+    margin-bottom: 0.75 rem;
 }
 
 h1 {
     text-align: center;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
-    font-size: 3rem;
+    font-size: 2rem;
     color: #2c3e50;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -201,6 +201,13 @@ h1 {
     border: none;
     cursor: pointer;
     font-weight: 600;
+}
+
+.charts-section {
+  background-color: #f5e6de;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0 1rem 1rem;
 }
 
 header {
