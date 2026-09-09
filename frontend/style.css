@@ -122,14 +122,14 @@ h1 {
 
 #stats {
     height: 100%;
+    align-self: stretch;
     box-sizing: border-box;
     width: fit-content;
     padding: 30px;
     min-width: 30%;
-    background: #f5e6de;
     border: #2c3e50 solid 3px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: #e9b7a3;
+    background-color: #f5e6de;
     border-radius: 10px;
 }
 
