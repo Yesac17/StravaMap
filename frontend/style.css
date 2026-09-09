@@ -272,7 +272,7 @@ header {
 .left-panel {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-self: stretch;
 }
 
 .scroll-hint {
