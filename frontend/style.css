@@ -121,7 +121,7 @@ h1 {
 }
 
 #stats {
-    height: 100%;
+    flex: 1;
     align-self: stretch;
     box-sizing: border-box;
     width: fit-content;
