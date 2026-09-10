@@ -151,10 +151,28 @@ h1 {
 }
 
 .below-map {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
     margin: 0.5rem 0 1rem;
+}
+
+.scroll-hint {
+    text-align: center;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #2b3a55;
+    opacity: 0.8;
+    cursor: pointer;
+    min-width: 30%;
+}
+
+#milemarkercheck {
+    text-align: center;
+    font-size: 1rem;
+    color: #2c3e50;
+    font-weight: bold;
+    width: 60%;
 }
 
 #milemarkercheck {
