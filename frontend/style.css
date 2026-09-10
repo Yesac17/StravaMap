@@ -152,13 +152,13 @@ h1 {
 
 .below-map {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
     margin: 0.5rem 0 1rem;
 }
 
 #milemarkercheck {
-    text-align: left;
+    text-align: center;
     font-size: 1rem;
     color: #2c3e50;
     font-weight: bold;
@@ -269,7 +269,7 @@ header {
 }
 
 .scroll-hint {
-    text-align: right;
+    text-align: center;
     font-style: italic;
     font-size: 1.1rem;
     color: #2b3a55;
