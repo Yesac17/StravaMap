@@ -12,6 +12,10 @@ body {
     margin-bottom: 0.75rem;
 }
 
+h2 {
+    color: #2c3e50;
+}
+
 h1 {
     text-align: center;
     margin-top: 1rem;
@@ -177,13 +181,6 @@ h1 {
     width: 60%;
 }
 
-#milemarkercheck {
-    text-align: center;
-    font-size: 1rem;
-    color: #2c3e50;
-    font-weight: bold;
-}
-
 
 .mile-marker {
     background: #2c3e50;
@@ -286,15 +283,6 @@ header {
     justify-content: center;
     gap: 12px;
     margin-top: 10px;
-}
-
-.scroll-hint {
-    text-align: center;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: #2b3a55;
-    opacity: 0.8;
-    cursor: pointer;
 }
 
 .scroll-hint:hover {
